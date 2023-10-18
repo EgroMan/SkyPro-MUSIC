@@ -52,7 +52,7 @@ export function LoginPage ({setUser}){
  console.log(setUser)
   return(
     <div>
-    <Text__h1>"Страница входа"</Text__h1>
+    <Text__h1>Страница входа</Text__h1>
     <Login_button onClick={()=> setUser(true)}>
       <Link to = '/'> Авторизация</Link> 
     </Login_button>

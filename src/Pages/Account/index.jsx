@@ -1,6 +1,7 @@
 import styled from "styled-components";
-export const Text2__h1 = styled.h1`
+import React from "react";
 
+export const Text2__h1 = styled.h1`
 color: black;
 font-style: normal;
 font-weight: 400;

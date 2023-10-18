@@ -22,7 +22,7 @@ export function MyListPage (){
     return(
     
     <div>
-    <Text__h1>"Мой плейлист"</Text__h1>
+    <Text__h1>Мой плейлист</Text__h1>
     </div>
     
     )

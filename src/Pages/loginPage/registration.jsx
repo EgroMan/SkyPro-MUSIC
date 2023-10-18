@@ -1,3 +1,4 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import * as S from "./AuthPage.styles";
 import { useEffect, useState } from "react";
