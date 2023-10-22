@@ -1,4 +1,3 @@
-import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { ErrPage } from './Pages/errPage/notfound';
 import { MainPage } from "./Pages/mainPage/main";

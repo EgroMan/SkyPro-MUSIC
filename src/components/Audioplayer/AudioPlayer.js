@@ -1,83 +1,51 @@
 import sprite from "./sprite.svg";
+
 import React, { useEffect, useRef, useState } from "react";
+
 import "react-loading-skeleton/dist/skeleton.css";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "../../img/icon/play.svg";
 import * as S from "./PlayerStyles";
-import { getTracks } from "../../api";
-//redux
 
-import { useSelector } from "react-redux";
-import { setNextRedux,setPrevRedux } from "../../store/reducers/playerSlice";
-import { useDispatch } from "react-redux";
-let tracks=[]
-
-export function Player({playerVisibility}) {
-
-  
-
+export function Player({ playerVisibility, activeTrack }) {
   const realPlayer = useRef(null);
   const [playerOn, setPlayerOn] = useState(false);
   const [loopOn, setLoopOn] = useState(false);
   const [volumeOn, setVolumeOn] = useState(0.2);
   const [progressOn, setProgressOn] = useState(0);
   const [trackTime, setTrackTime] = useState(0);
-  const [trackPlay, setTrackPlay] = useState([]);
+  const [timePlay, setTimePlay] = useState(0);
 
-  let errorText = null;
- 
-//redux
-const activeTrackRedux = useSelector(state=>state.track.activeTrack)
-const trackTimeRedux = useSelector(state=>state.track.trackTime)
-const dispatch=useDispatch()
+  // let trackDuration = activeTrack.duration_in_seconds
 
-let activeTrack=activeTrackRedux;
+  useEffect(() => {
 
-
-
-
-// activeTrack=tracks[nextTrackRedux];
-// activeTrack=tracks[prevTrackRedux];
-
-useEffect(() => {
-  
-
-
-    if(!playerOn){
+    if (playerOn){
     setTimeout(() => {
       realPlayer.current.addEventListener("timeupdate", () => {
         setProgressOn(realPlayer.current.currentTime);
-        
       });
     }, 1000);
     setTimeout(() => {
       realPlayer.current.addEventListener("loadedmetadata", () => {
         setTrackTime(realPlayer.current.duration);
-        
-        console.log(trackTimeRedux)
-        // console.log(trackTime)
       });
     }, 1);
-
-    // return () => {
-    //   realPlayer.current.removeEventListener("timeupdate", () => {
-    //     setProgressOn(realPlayer.current.currentTime);
-    //   });
-    //   realPlayer.current.removeEventListener("loadedmetadata", () => {
-    //     setTrackTime(realPlayer.current.duration);
-    //   });
-    // };
- 
-}
-
-}, []);
-
+    return () => {
+      realPlayer.current.removeEventListener("timeupdate", () => {
+        setProgressOn(realPlayer.current.currentTime);
+      });
+      realPlayer.current.removeEventListener("loadedmetadata", () => {
+        setTrackTime(realPlayer.current.duration);
+      });
+    };
+}}, []);
 
   const clickPlayerStart = () => {
-   
     realPlayer.current.play();
     setPlayerOn(true);
-
+    console.log(realPlayer);
+    console.log("click");
   };
   const clickPlayerStop = () => {
     realPlayer.current.pause();
@@ -92,24 +60,20 @@ useEffect(() => {
     setLoopOn(false);
   };
 
-
   const [contentVisible, setContentVisible] = useState(false);
   setTimeout(() => {
     setContentVisible(true);
   }, 500);
 
   return (
-    <S.bar style={{ visibility: `${!playerVisibility}` }}>
+    <S.bar style={{ visibility: `${playerVisibility}` }}>
       <S.barContent>
         <audio
           hidden
           id="audio"
           controls
           ref={realPlayer}
-          src={          
-            activeTrack
-            
-            .track_file}
+          src={activeTrack.track_file}
           style={{ marginBottom: "20px" }}
         >
           AudioPlayer
@@ -136,8 +100,7 @@ useEffect(() => {
             <S.playerControls>
               <S.playerBtnPrev>
                 <S.playerBtnPrevSvg
-                  onClick={()=>dispatch(setPrevRedux())}
-                                                                              //PREV
+                  onClick={() => alert("не реализовано")}
                   alt="prev"
                 >
                   <use xlinkHref="img/icon/sprite.svg#icon-prev"></use>
@@ -147,10 +110,10 @@ useEffect(() => {
 
               <S.playerBtnPlay className="_btn">
                 <S.playerBtnPlaySvg
-                  onClick={playerOn ? clickPlayerStop :  clickPlayerStart}
+                  onClick={playerOn ? clickPlayerStop : clickPlayerStart}
                   alt="play"
                 >
-                  
+                  {/* <use xlinkHref="img/icon/sprite.svg#icon-play"></use> */}
                   <use
                     href={
                       playerOn ? `${sprite}#icon-pause` : `${sprite}#icon-play`
@@ -160,9 +123,9 @@ useEffect(() => {
               </S.playerBtnPlay>
               <S.playerBtnNext>
                 <S.playerBtnNextSvg
-                  onClick={()=>dispatch(setNextRedux())}
-                                     //set activetreck - next, click play start                                               //NEXT
-                  alt="next">
+                  onClick={() => alert("не реализовано")}
+                  alt="next"
+                >
                   <use xlinkHref="img/icon/sprite.svg#icon-next"></use>
                   <use href={`${sprite}#icon-next`} />
                 </S.playerBtnNextSvg>

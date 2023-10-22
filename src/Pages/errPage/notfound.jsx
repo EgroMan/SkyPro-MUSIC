@@ -22,7 +22,7 @@ export function ErrPage (){
     return(
     
     <div>
-    <Text__h1>Ошибка 404 страница не существует</Text__h1>
+    <Text__h1>"Ошибка 404 страница не существует"</Text__h1>
     </div>
     
     )
