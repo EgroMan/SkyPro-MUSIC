@@ -1,7 +1,5 @@
 import sprite from "./sprite.svg";
-
 import React, { useEffect, useRef, useState } from "react";
-
 import "react-loading-skeleton/dist/skeleton.css";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "../../img/icon/play.svg";
@@ -19,7 +17,6 @@ export function Player({ playerVisibility, activeTrack }) {
   // let trackDuration = activeTrack.duration_in_seconds
 
   useEffect(() => {
-
     if (playerOn){
     setTimeout(() => {
       realPlayer.current.addEventListener("timeupdate", () => {
@@ -31,15 +28,34 @@ export function Player({ playerVisibility, activeTrack }) {
         setTrackTime(realPlayer.current.duration);
       });
     }, 1);
-    return () => {
-      realPlayer.current.removeEventListener("timeupdate", () => {
-        setProgressOn(realPlayer.current.currentTime);
+  };
+  fetch('https://skypro-music-api.skyeng.tech/catalog/track/all/')
+  .then (response => response.json())
+  .then(data => setTrackTime(data.duration_in_seconds))
+  .catch(error => console.log(error));
+
+  if (playerOn) {
+    setTimeout(() => {
+      realPlayer.current.addEventListener("timeupdate", () => {
+        setProgressOn (realPlayer.current.currentTime);
       });
-      realPlayer.current.removeEventListener("loadedmetadata", () => {
-        setTrackTime(realPlayer.current.duration);
-      });
-    };
-}}, []);
+    }, 1000);
+    
+      setTimeout(() => { 
+        realPlayer.current.addEventListener("loadedmetadata", () => { 
+          setTrackTime(realPlayer.current.duration); 
+        }); 
+      }, 1); 
+      return () => { 
+        realPlayer.current.removeEventListener("timeupdate", () => { 
+          setProgressOn(realPlayer.current.currentTime); 
+        }); 
+        realPlayer.current.removeEventListener("loadedmetadata", () => { 
+          setTrackTime(realPlayer.current.duration); 
+        }); 
+      }; 
+    }
+  }, [playerOn]); 
 
   const clickPlayerStart = () => {
     realPlayer.current.play();
@@ -89,6 +105,7 @@ export function Player({ playerVisibility, activeTrack }) {
           value={progressOn}
           max={trackTime}
         ></S.progress>
+        <span>{progressOn} / {trackTime}</span>
 
         <S.playerBlock>
           <S.barPlayer_player>
