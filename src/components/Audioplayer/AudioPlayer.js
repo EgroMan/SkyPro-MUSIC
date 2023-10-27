@@ -5,6 +5,12 @@ import { SkeletonTheme } from "react-loading-skeleton";
 import "../../img/icon/play.svg";
 import * as S from "./PlayerStyles";
 
+const formatTime = (timeInSeconds) => {
+  const minutes = Math.floor(timeInSeconds / 60);
+  const seconds = Math.floor(timeInSeconds % 60);
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
+
 export function Player({ playerVisibility, activeTrack }) {
   const realPlayer = useRef(null);
   const [playerOn, setPlayerOn] = useState(false);
@@ -13,49 +19,33 @@ export function Player({ playerVisibility, activeTrack }) {
   const [progressOn, setProgressOn] = useState(0);
   const [trackTime, setTrackTime] = useState(0);
   const [timePlay, setTimePlay] = useState(0);
-
-  // let trackDuration = activeTrack.duration_in_seconds
+  const [currentTime, setCurrentTime] = useState(0);
+  <span>{formatTime(currentTime)} / {formatTime(trackTime)}</span>
 
   useEffect(() => {
-    if (playerOn){
-    setTimeout(() => {
-      realPlayer.current.addEventListener("timeupdate", () => {
-        setProgressOn(realPlayer.current.currentTime);
-      });
-    }, 1000);
-    setTimeout(() => {
-      realPlayer.current.addEventListener("loadedmetadata", () => {
-        setTrackTime(realPlayer.current.duration);
-      });
-    }, 1);
-  };
-  fetch('https://skypro-music-api.skyeng.tech/catalog/track/all/')
-  .then (response => response.json())
-  .then(data => setTrackTime(data.duration_in_seconds))
-  .catch(error => console.log(error));
-
   if (playerOn) {
-    setTimeout(() => {
-      realPlayer.current.addEventListener("timeupdate", () => {
-        setProgressOn (realPlayer.current.currentTime);
-      });
+    let timeupdateListener = () => {
+      setProgressOn(realPlayer.current.currentTime);
+    };
+    let loadedmetadataListener = () => {
+      setTrackTime(realPlayer.current.duration);
+    };
+    const intervalId = setInterval(() => {
+      setCurrentTime(realPlayer.current.currentTime);
     }, 1000);
-    
-      setTimeout(() => { 
-        realPlayer.current.addEventListener("loadedmetadata", () => { 
-          setTrackTime(realPlayer.current.duration); 
-        }); 
-      }, 1); 
-      return () => { 
-        realPlayer.current.removeEventListener("timeupdate", () => { 
-          setProgressOn(realPlayer.current.currentTime); 
-        }); 
-        realPlayer.current.removeEventListener("loadedmetadata", () => { 
-          setTrackTime(realPlayer.current.duration); 
-        }); 
-      }; 
-    }
-  }, [playerOn]); 
+    realPlayer.current.addEventListener("timeupdate", timeupdateListener);
+    realPlayer.current.addEventListener("loadedmetadata", loadedmetadataListener);
+
+    fetch('https://skypro-music-api.skyeng.tech/catalog/track/all/')
+      .then(response => response.json())
+      .then(data => setTrackTime(data.duration_in_seconds))
+      .catch(error => console.log(error));
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }
+}, [playerOn]);
 
   const clickPlayerStart = () => {
     realPlayer.current.play();
@@ -92,6 +82,7 @@ export function Player({ playerVisibility, activeTrack }) {
           src={activeTrack.track_file}
           style={{ marginBottom: "20px" }}
         >
+          
           AudioPlayer
         </audio>
         <S.progress
@@ -105,15 +96,14 @@ export function Player({ playerVisibility, activeTrack }) {
           value={progressOn}
           max={trackTime}
         ></S.progress>
-        <span>{progressOn} / {trackTime}</span>
 
         <S.playerBlock>
           <S.barPlayer_player>
-            <div>
-              <h2 style={{ marginLeft: "20px", color: "gray" }}>
-                {((trackTime - progressOn) / 60).toFixed(2)}{" "}
-              </h2>
-            </div>
+          <div>
+            <h2 style={{ marginLeft: "20px", color: "gray" }}>
+              {formatTime(currentTime)}{" "}
+            </h2>
+          </div>
             <S.playerControls>
               <S.playerBtnPrev>
                 <S.playerBtnPrevSvg
