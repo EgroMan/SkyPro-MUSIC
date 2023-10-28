@@ -12,5 +12,5 @@ export function Tracks() {
     }, 4000);
 
     return(
-    <S.Centerblock__h2>{contentVisible ? <span>Tracks</span> : <span>Треки</span>}</S.Centerblock__h2>
+    <S.Centerblock__h2>{contentVisible ? <span>Треки</span> : <span>Треки</span>}</S.Centerblock__h2>
     )}

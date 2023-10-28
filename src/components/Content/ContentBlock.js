@@ -51,11 +51,6 @@ export function Content({ activeTrack, setActiveTrack, setPlayerOn }) {
       });
   }, []);
 
-  // const [contentVisible, setContentVisible] = useState(false);
-  // setTimeout(() => {
-  // setContentVisible(true);
-  // }, 1000);
-
   return (
     <S.CentralBlockContent>
       <S.CentralBlock_playlistTitle>
@@ -80,7 +75,6 @@ export function Content({ activeTrack, setActiveTrack, setPlayerOn }) {
         {tracks.map((track) => {
           return (
             <S.Playlist__item key={track.id}>
-              {/* block start */}
 
               <S.Playlist__track
                 onClick={(e) => {
@@ -92,12 +86,6 @@ export function Content({ activeTrack, setActiveTrack, setPlayerOn }) {
                 }}
               >
                 <S.Track__title
-
-                // onClick={()=>{
-                // console.log('player load');
-                // setPlayerOn('');
-                // setActiveTrack(track);
-                // }}
                 >
                   <S.Track__titleImage>
                     {contentVisible ? (

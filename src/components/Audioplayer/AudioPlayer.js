@@ -4,6 +4,25 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "../../img/icon/play.svg";
 import * as S from "./PlayerStyles";
+import { getTracks } from "../../api";
+
+import { UseSelector, useDispatch, useSelector } from "react-redux"
+import {
+  setNextRedux,
+  setPrevRedux,
+  setTimeRedux,
+  setProgressRedux,
+  setShuffleRedux,
+  setNotShuffleRedux,
+  setOnDotRedux,
+  setOffDotRedux,
+  setCycleRedux 
+} from "../../store/reducers/todo"
+
+const activeTrackRedux = useSelector(state=>state.track.activeTrack)
+const dispatch = useDispatch()
+
+let activeTrack = activeTrackRedux
 
 const formatTime = (timeInSeconds) => {
   const minutes = Math.floor(timeInSeconds / 60);
@@ -50,20 +69,31 @@ export function Player({ playerVisibility, activeTrack }) {
   const clickPlayerStart = () => {
     realPlayer.current.play();
     setPlayerOn(true);
-    console.log(realPlayer);
-    console.log("click");
+    dispatch(setOnDotRedux)
   };
   const clickPlayerStop = () => {
     realPlayer.current.pause();
     setPlayerOn(false);
+    dispatch(setOffDotRedux())
   };
   const clickPlayerLoopOn = () => {
     realPlayer.current.loop = true;
     setLoopOn(true);
+    dispatch(setCycleRedux())
+    console.log(activeTrack)
   };
   const clickPlayerLoopOff = () => {
     realPlayer.current.loop = false;
     setLoopOn(false);
+    dispatch(setCycleRedux())
+  };
+  const clickPlayerShuffleOn = () => {
+    dispatch(setShuffleRedux())
+    setMixOn(true);
+  };
+  const clickPlayerShuffleOff = () => {
+    dispatch(setNotShuffleRedux())
+    setMixOn(false);
   };
 
   const [contentVisible, setContentVisible] = useState(false);
@@ -107,7 +137,7 @@ export function Player({ playerVisibility, activeTrack }) {
             <S.playerControls>
               <S.playerBtnPrev>
                 <S.playerBtnPrevSvg
-                  onClick={() => alert("не реализовано")}
+                  onClick={()=>{dispatch(setPrevRedux())}}
                   alt="prev"
                 >
                   <use xlinkHref="img/icon/sprite.svg#icon-prev"></use>
@@ -120,7 +150,6 @@ export function Player({ playerVisibility, activeTrack }) {
                   onClick={playerOn ? clickPlayerStop : clickPlayerStart}
                   alt="play"
                 >
-                  {/* <use xlinkHref="img/icon/sprite.svg#icon-play"></use> */}
                   <use
                     href={
                       playerOn ? `${sprite}#icon-pause` : `${sprite}#icon-play`
@@ -130,7 +159,7 @@ export function Player({ playerVisibility, activeTrack }) {
               </S.playerBtnPlay>
               <S.playerBtnNext>
                 <S.playerBtnNextSvg
-                  onClick={() => alert("не реализовано")}
+                  onClick={ ()=>{dispatch(setNextRedux())}}
                   alt="next"
                 >
                   <use xlinkHref="img/icon/sprite.svg#icon-next"></use>
@@ -142,7 +171,6 @@ export function Player({ playerVisibility, activeTrack }) {
                   onClick={loopOn ? clickPlayerLoopOff : clickPlayerLoopOn}
                   alt="repeat"
                 >
-                  {/* <use xlinkHref="img/icon/sprite.svg#icon-repeat"></use> */}
                   <use
                     href={loopOn ? `${sprite}#loopOn` : `${sprite}#icon-repeat`}
                   />
@@ -150,10 +178,9 @@ export function Player({ playerVisibility, activeTrack }) {
               </S.playerBtnRepeat>
               <S.playerBtnShuffle className=" _btn-icon">
                 <S.playerBtnShuffleSvg
-                  onClick={() => alert("не реализовано")}
+                  onClick={  mix ? clickPlayerShuffleOff : clickPlayerShuffleOn }
                   alt="shuffle"
                 >
-                  {/* <use xlinkHref="img/icon/sprite.svg#icon-shuffle"></use> */}
                   <use href={`${sprite}#icon-shuffle`} />
                 </S.playerBtnShuffleSvg>
               </S.playerBtnShuffle>
