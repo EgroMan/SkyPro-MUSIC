@@ -2,7 +2,9 @@ import { createSlice, current } from "@reduxjs/toolkit";
 import { useState } from "react";
 
 const playerSlice = createSlice({
+
   name: 'player',
+
   initialState: {
     activeTrack: [],
     tracks: [],
@@ -46,9 +48,11 @@ const playerSlice = createSlice({
     setProgressRedux(state, action) {
       let next = state.activeTrack.id - 7
       state.trackProgressTime = action.payload
+
       let deltaTime = Math.round((state.trackTime - state.trackProgressTime) * 100) / 100
       if (deltaTime <= 1 & state.repeat === false) {
         console.log('repeat true')
+
         if (next - state.tracks.length === 0) {
           state.activeTrack = state.tracks[state.tracks.length - state.tracks.length]
           ; console.log(state.activeTrack)
@@ -64,37 +68,51 @@ const playerSlice = createSlice({
     setTimeRedux(state, action) {
       state.trackTime = action.payload
       console.log(state.trackTime)
+
+
     },
+
     setShuffleRedux(state) {
       state.shuffle = true
       state.tracks = state.tracks.sort(() => Math.random() - 0.5)
       console.log(state.tempTracks)
+
+
     },
     setNotShuffleRedux(state) {
       state.shuffle = false
       state.tracks = state.tempTracks
       console.log(state.tracks)
+
     },
+
     setOnDotRedux(state) {
       state.playerOn = true
       console.log(state.playerOn)
+
     },
     setOffDotRedux(state) {
       state.playerOn = false
       console.log(state.playerOn)
+
     },
     setCycleRedux(state) {
 
+
       if (state.repeat === false) {
+
         state.repeat = true
         console.log(state.repeat)
       } else {
+
         state.repeat = false
         console.log(state.repeat)
       }
     },
+
     setMyTracksRedux(state, action) {
       state.myTracks = action.payload.data
+
       console.log(state.myTracks)
     },
   }

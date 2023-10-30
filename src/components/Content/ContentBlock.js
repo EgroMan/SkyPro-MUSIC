@@ -3,9 +3,14 @@ import sprite from "./sprite.svg";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import React, { useEffect, useState } from "react";
-import * as S from "./ContentStyle.js";
-import { getTracks } from "../../api";
+import * as S from "./ContentStyle";
+import { addMyTracks, getTracks } from "../../api";
 import { Link } from "react-router-dom";
+
+//redux
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { setTrackRedux, setTrackIdRedux, setLikedStatusRedux } from "../../store/reducers/playerSlice";
 
 let errorText = null;
 let href;
@@ -32,9 +37,19 @@ let tracks = [
   { id: "20" },
   { id: "21" },
 ];
-export function Content({ activeTrack, setActiveTrack, setPlayerOn }) {
+export function Content({ playerOn, setPlayerOn }) {
   const [contentVisible, setContentVisible] = useState(false);
 
+
+  console.log(playerOn)
+
+  //redux
+  const activeTrackRedux = useSelector(state => state.track.activeTrack)
+  const playerOnDot = useSelector(state => state.track.playerOn)
+  const myTracksRedux = useSelector(state => state.track.myTracks)
+
+  console.log(myTracksRedux)
+  const dispatch = useDispatch();
   useEffect(() => {
     getTracks()
       .then((data) => {
@@ -50,7 +65,6 @@ export function Content({ activeTrack, setActiveTrack, setPlayerOn }) {
         return errorText;
       });
   }, []);
-
   return (
     <S.CentralBlockContent>
       <S.CentralBlock_playlistTitle>
@@ -74,25 +88,34 @@ export function Content({ activeTrack, setActiveTrack, setPlayerOn }) {
 
         {tracks.map((track) => {
           return (
-            <S.Playlist__item key={track.id}>
-
+            <S.Playlist__item key={track.id} >
               <S.Playlist__track
                 onClick={(e) => {
                   e.preventDefault();
 
                   console.log("player load");
-                  setPlayerOn("");
-                  setActiveTrack(track);
+                  setPlayerOn('');
+                  dispatch(setTrackRedux({ track, tracks }))
                 }}
               >
                 <S.Track__title
                 >
-                  <S.Track__titleImage>
-                    {contentVisible ? (
-                      <S.Track__titleSvg alt="music">
+                  <S.Track__titleImage >
+                    {contentVisible ? (<>
+
+                      <S.Playlist__titleSvg_dot_Pause style={track.id === activeTrackRedux.id & playerOnDot === false ? {
+                        display: 'block'
+                      } : { display: 'none' }}></S.Playlist__titleSvg_dot_Pause>
+                      <S.Playlist__titleSvg_dot style={track.id === activeTrackRedux.id & playerOnDot === true ? { display: 'block' } : { display: 'none' }}></S.Playlist__titleSvg_dot>
+
+                      <S.Track__titleSvg style={track.id === activeTrackRedux.id ? {
+                        display: 'none'
+                      } : {}} alt="music">
                         <use xlinkHref="img/icon/sprite.svg#icon-note"></use>
                         <use href={`${sprite}#icon-note`} />
                       </S.Track__titleSvg>
+                    </>
+
                     ) : (
                       <SkeletonTheme baseColor="#202020" highlightColor="#444">
                         <S.Skeleton_square />
@@ -145,9 +168,9 @@ export function Content({ activeTrack, setActiveTrack, setPlayerOn }) {
                 </S.Track__album>
                 <S.Track_time>
                   {contentVisible ? (
-                    <S.Track__timeSvg alt="time">
+                    <S.Track__timeSvg onClick={() => addMyTracks(track.id)} alt="time"> 
                       <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
-                      <use href={`${sprite}#icon-like`} />
+                      <use href={tracks.liked === true ? `${sprite}#icon-like-liked` : `${sprite}#icon-like`} />
                     </S.Track__timeSvg>
                   ) : (
                     <SkeletonTheme baseColor="#202020" highlightColor="#444">

@@ -1,7 +1,11 @@
 import { createGlobalStyle } from "styled-components";
 import { AppRoutes } from "./routs";
 import React, { forwardRef, useEffect, useRef, useState } from "react";
+import { Player } from "./components/Audioplayer/AudioPlayer";
+import { Nav } from "./components/Navmenu/NavMenu";
 export const UserContext = React.createContext(null);
+
+
 const GlobalStyle = createGlobalStyle`
 
   *{margin: 0;
@@ -42,17 +46,13 @@ const GlobalStyle = createGlobalStyle`
 
 `;
 
-
-
 export function App() {
-  
-  
-  // let localUser=localStorage.getItem('user')
   const [playerOn, setPlayerOn] = useState("hidden");
   const [user, setUser] = useState(false);
   const [userName, setUserName]=useState(null)
   const [userPass, setUserPass]=useState(null)
-  const[isLoginMode, setIsLoginMode]=useState(true)
+  const [isLoginMode, setIsLoginMode]=useState(true)
+  const [listName, setListName]=useState('Tracks')
   
   let userLoginName= localStorage.getItem('userName')
   let textName= 'Имя пользователя:'
@@ -61,10 +61,11 @@ export function App() {
   return (
     <div className="App">
     <UserContext.Provider value={arrNameUser}>
-      <AppRoutes isLoginMode={isLoginMode}  setIsLoginMode={setIsLoginMode} setUserPass={setUserPass} setUserName={setUserName} user={user} setUser={setUser} playerOn={playerOn}setPlayerOn={setPlayerOn}/>
+    
+      <AppRoutes listName={listName} setListName={setListName} isLoginMode={isLoginMode}  setIsLoginMode={setIsLoginMode} setUserPass={setUserPass} setUserName={setUserName} user={user} setUser={setUser} playerOn={playerOn}setPlayerOn={setPlayerOn}/>
+      <Player playerVisibility = {playerOn} 
+      />
     </UserContext.Provider> 
-      {/* <ExampleButtonInput />
-      <AutoFocusInput /> */}
       <GlobalStyle />
     </div>
   );

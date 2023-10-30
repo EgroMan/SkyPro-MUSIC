@@ -6,8 +6,10 @@ import "../../img/icon/play.svg";
 import * as S from "./PlayerStyles";
 import { getTracks } from "../../api";
 
-import { UseSelector, useDispatch, useSelector } from "react-redux"
-import {
+//redux
+
+import { useSelector } from "react-redux";
+import { 
   setNextRedux,
   setPrevRedux,
   setTimeRedux,
@@ -16,63 +18,66 @@ import {
   setNotShuffleRedux,
   setOnDotRedux,
   setOffDotRedux,
-  setCycleRedux 
-} from "../../store/reducers/todo"
+  setCycleRedux} from "../../store/reducers/playerSlice";
+import { useDispatch } from "react-redux";
 
-const activeTrackRedux = useSelector(state=>state.track.activeTrack)
-const dispatch = useDispatch()
 
-let activeTrack = activeTrackRedux
+export function Player({playerVisibility}) {
 
-const formatTime = (timeInSeconds) => {
-  const minutes = Math.floor(timeInSeconds / 60);
-  const seconds = Math.floor(timeInSeconds % 60);
-  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-};
+  
 
-export function Player({ playerVisibility, activeTrack }) {
   const realPlayer = useRef(null);
   const [playerOn, setPlayerOn] = useState(false);
   const [loopOn, setLoopOn] = useState(false);
   const [volumeOn, setVolumeOn] = useState(0.2);
   const [progressOn, setProgressOn] = useState(0);
   const [trackTime, setTrackTime] = useState(0);
-  const [timePlay, setTimePlay] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  <span>{formatTime(currentTime)} / {formatTime(trackTime)}</span>
+  const [mix, setMixOn] = useState(false);
+  
 
-  useEffect(() => {
-  if (playerOn) {
-    let timeupdateListener = () => {
-      setProgressOn(realPlayer.current.currentTime);
-    };
-    let loadedmetadataListener = () => {
-      setTrackTime(realPlayer.current.duration);
-    };
-    const intervalId = setInterval(() => {
-      setCurrentTime(realPlayer.current.currentTime);
-    }, 1000);
-    realPlayer.current.addEventListener("timeupdate", timeupdateListener);
-    realPlayer.current.addEventListener("loadedmetadata", loadedmetadataListener);
+  
+ 
+//redux
+const activeTrackRedux = useSelector(state=>state.track.activeTrack)
+const dispatch=useDispatch()
 
-    fetch('https://skypro-music-api.skyeng.tech/catalog/track/all/')
-      .then(response => response.json())
-      .then(data => setTrackTime(data.duration_in_seconds))
-      .catch(error => console.log(error));
+
+let activeTrack = activeTrackRedux
+
+
+useEffect(() => {
+    if(!playerOn){
+    setTimeout(() => {
+      realPlayer?.current.addEventListener("timeupdate", () => {
+        setProgressOn(realPlayer.current.currentTime);
+         dispatch(setProgressRedux(realPlayer.current.currentTime))
+      });
+    }, 1);
+    setTimeout(() => {
+      realPlayer?.current.addEventListener("loadedmetadata", () => {
+        setTrackTime(realPlayer.current.duration);
+        
+         dispatch(setTimeRedux(realPlayer.current.duration))
+      });
+    }, 1);
 
     return () => {
-      clearInterval(intervalId);
+      realPlayer.current.removeEventListener("timeupdate", () => {
+        setProgressOn(realPlayer.current.currentTime);
+      });
+      realPlayer?.current.removeEventListener("loadedmetadata", () => {
+        setTrackTime(realPlayer.current.duration);
+      });
     };
-  }
-}, [playerOn]);
-
+}
+}, []);
   const clickPlayerStart = () => {
-    realPlayer.current.play();
+    realPlayer?.current.play();
     setPlayerOn(true);
-    dispatch(setOnDotRedux)
+    dispatch(setOnDotRedux())
   };
   const clickPlayerStop = () => {
-    realPlayer.current.pause();
+    realPlayer?.current.pause();
     setPlayerOn(false);
     dispatch(setOffDotRedux())
   };
@@ -81,27 +86,40 @@ export function Player({ playerVisibility, activeTrack }) {
     setLoopOn(true);
     dispatch(setCycleRedux())
     console.log(activeTrack)
+
+    console.log(activeTrack.id)
+    console.log(activeTrack[0])
   };
   const clickPlayerLoopOff = () => {
     realPlayer.current.loop = false;
     setLoopOn(false);
-    dispatch(setCycleRedux())
+     dispatch(setCycleRedux())
   };
+
   const clickPlayerShuffleOn = () => {
     dispatch(setShuffleRedux())
+   
     setMixOn(true);
   };
   const clickPlayerShuffleOff = () => {
     dispatch(setNotShuffleRedux())
+   
     setMixOn(false);
   };
+
 
   const [contentVisible, setContentVisible] = useState(false);
   setTimeout(() => {
     setContentVisible(true);
   }, 500);
 
-  return (
+if(playerOn){
+  realPlayer.current.play();
+}
+
+
+
+  return ( 
     <S.bar style={{ visibility: `${playerVisibility}` }}>
       <S.barContent>
         <audio
@@ -112,7 +130,6 @@ export function Player({ playerVisibility, activeTrack }) {
           src={activeTrack.track_file}
           style={{ marginBottom: "20px" }}
         >
-          
           AudioPlayer
         </audio>
         <S.progress
@@ -126,14 +143,13 @@ export function Player({ playerVisibility, activeTrack }) {
           value={progressOn}
           max={trackTime}
         ></S.progress>
-
         <S.playerBlock>
           <S.barPlayer_player>
-          <div>
-            <h2 style={{ marginLeft: "20px", color: "gray" }}>
-              {formatTime(currentTime)}{" "}
-            </h2>
-          </div>
+            <div>
+              <h2 style={{ marginLeft: "20px", color: "gray" }}>
+                {((trackTime - progressOn) / 60).toFixed(2)}{" "}
+              </h2>
+            </div>
             <S.playerControls>
               <S.playerBtnPrev>
                 <S.playerBtnPrevSvg
@@ -147,7 +163,9 @@ export function Player({ playerVisibility, activeTrack }) {
 
               <S.playerBtnPlay className="_btn">
                 <S.playerBtnPlaySvg
-                  onClick={playerOn ? clickPlayerStop : clickPlayerStart}
+                  onClick={
+                    playerOn ? clickPlayerStop :  clickPlayerStart          
+                  }
                   alt="play"
                 >
                   <use
@@ -159,9 +177,8 @@ export function Player({ playerVisibility, activeTrack }) {
               </S.playerBtnPlay>
               <S.playerBtnNext>
                 <S.playerBtnNextSvg
-                  onClick={ ()=>{dispatch(setNextRedux())}}
-                  alt="next"
-                >
+                  onClick={ ()=>{dispatch(setNextRedux())}}                            //
+                  alt="next">
                   <use xlinkHref="img/icon/sprite.svg#icon-next"></use>
                   <use href={`${sprite}#icon-next`} />
                 </S.playerBtnNextSvg>
@@ -172,16 +189,16 @@ export function Player({ playerVisibility, activeTrack }) {
                   alt="repeat"
                 >
                   <use
-                    href={loopOn ? `${sprite}#loopOn` : `${sprite}#icon-repeat`}
+                    href={loopOn ? `${sprite}#loopOn` : `${sprite}#icon-repeat`}                   
                   />
                 </S.playerBtnRepeatSvg>
               </S.playerBtnRepeat>
-              <S.playerBtnShuffle className=" _btn-icon">
+              <S.playerBtnShuffle  className=" _btn-icon">
                 <S.playerBtnShuffleSvg
                   onClick={  mix ? clickPlayerShuffleOff : clickPlayerShuffleOn }
                   alt="shuffle"
                 >
-                  <use href={`${sprite}#icon-shuffle`} />
+                  <use href={mix?`${sprite}#icon-shuffle-off`: `${sprite}#icon-shuffle`} />
                 </S.playerBtnShuffleSvg>
               </S.playerBtnShuffle>
             </S.playerControls>
@@ -255,7 +272,7 @@ export function Player({ playerVisibility, activeTrack }) {
                     let volumeRange = e.target.value / 100;
                     realPlayer.current.volume = volumeRange;
                     setVolumeOn(volumeRange);
-                    console.log(volumeOn);
+                    
                   }}
                   className="_btn"
                   type="range"
@@ -267,5 +284,7 @@ export function Player({ playerVisibility, activeTrack }) {
         </S.playerBlock>
       </S.barContent>
     </S.bar>
+    
   );
+  
 }

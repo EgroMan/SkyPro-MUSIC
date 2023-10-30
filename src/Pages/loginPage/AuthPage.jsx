@@ -2,8 +2,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import * as S from "./AuthPage.styles";
 import React, { useEffect, useState } from "react";
 import { login, registration } from "../../api";
-
-
+import logo from "../../img/logo_modal.png"
 export default function AuthPage({isLoginMode, setIsLoginMode, setUser, user  }) {
   const [error, setError]=useState(null)
   const [email, setEmail] = useState("");
@@ -15,20 +14,15 @@ export default function AuthPage({isLoginMode, setIsLoginMode, setUser, user  })
   const navigate=useNavigate()
   const [buttonActive, setButtonActive] = useState(false);
   
-
   const handleLogin = async ({ email, password }) => {
     setButtonActive(true)
-
     let responseOk=false;
-    
-
     login(email,password).then((response)=>{
       setButtonActive(false)
       console.log(response.status)
       if (response.ok){
       let data = response.json()
       responseOk=true
-      
       return(data)
     }
     else{
@@ -37,32 +31,19 @@ export default function AuthPage({isLoginMode, setIsLoginMode, setUser, user  })
       return(data)
     }})
     .then((data)=>{       
-
       if (!responseOk){
-
         setError(data.detail)
       }else{
-
-      
       console.log(data)  
       localStorage.setItem('userName',data.username)
-      
       if(responseOk===true){
       setTimeout(
       setUser(true),1000)}
       navigate("/",{replace:true})
       alert(`Выполняется вход: ${email} ${password}`);
-      
-
     }
- 
-      
     })
- 
-    
-    
   };
-
   const handleRegister = async () => {
     let responseOk=false;
     setButtonActive(true)
@@ -111,16 +92,8 @@ export default function AuthPage({isLoginMode, setIsLoginMode, setUser, user  })
       }
       
     })}
-   
-
-  
   }
-    
-    // alert(`Выполняется регистрация: ${email} ${password}`);
-    // setError("Неизвестная ошибка регистрации");
   };
-
-  // Сбрасываем ошибку если пользователь меняет данные на форме или меняется режим формы
   useEffect(() => {
     setError(null);
   }, [isLoginMode, email, password, repeatPassword]);
@@ -130,7 +103,7 @@ export default function AuthPage({isLoginMode, setIsLoginMode, setUser, user  })
       <S.ModalForm>
         <Link to="/login">
           <S.ModalLogo>
-            <S.ModalLogoImage src="/img/logo_modal.png" alt="logo" />
+            <S.ModalLogoImage src="/logo_modal.png" alt="logo" />
           </S.ModalLogo>
         </Link>
         {isLoginMode ? (

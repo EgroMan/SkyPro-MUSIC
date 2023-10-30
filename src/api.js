@@ -1,7 +1,6 @@
 
 export async function getTracks() {
     const response = await fetch('https://skypro-music-api.skyeng.tech/catalog/track/all/')
-
     if (!response.ok) {
         throw new Error('Ошибка сервера')
     }
@@ -22,14 +21,13 @@ export async function registration(email, password, username) {
                 "content-type": "application/json",
             },
         }).catch((error) => { alert(error.message) })
+
     getToken(email, password).then((response) => { let data = response.json(); return data })
         .then((data) => {
             localStorage.setItem('access', data.access)
         })
     return response
-
 }
-
 export async function login(email, password) {
     const response = await fetch('https://skypro-music-api.skyeng.tech/user/login/',
         {
@@ -37,7 +35,6 @@ export async function login(email, password) {
             body: JSON.stringify({
                 email: `${email}`,
                 password: `${password}`,
-
             }),
             headers: {
                 "content-type": "application/json",
@@ -49,7 +46,6 @@ export async function login(email, password) {
         })
     return response
 }
-
 export async function getToken(email, password) {
     const response = await fetch('https://skypro-music-api.skyeng.tech/user/token/',
         {
@@ -63,6 +59,7 @@ export async function getToken(email, password) {
             },
         }).catch((error) => { alert(error.message) })
     return response
+
 }
 
 export async function getMyTracks() {
