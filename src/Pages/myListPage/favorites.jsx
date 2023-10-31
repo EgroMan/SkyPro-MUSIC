@@ -6,78 +6,70 @@ import "react-loading-skeleton/dist/skeleton.css";
 import React, { useEffect, useState } from "react";
 import * as S from "./favoritesStyle";
 import { delMyTracks, getMyTracks, getTracks } from "../../api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Nav } from "../../components/Navmenu/NavMenu";
 import { Search } from "../../components/Search/Search";
 import { Tracks } from "../../components/Tracs/tracs";
 import { Filter } from "../../components/Filter/FilterBlock";
 import { Sidebar } from "../../components/Sidebar/SideBar";
-
-
+//redux
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { setTrackRedux, setMyTracksRedux } from "../../store/reducers/playerSlice";
+import { setTrackRedux, setMyTracksRedux, likeTrackRedux } from "../../store/reducers/playerSlice";
 
 
 let errorText = null;
-let href;
-let tracks = [
-    { id: "1" },
-    { id: "2" },
-    { id: "3" },
-    { id: "4" },
-    { id: "5" },
-    { id: "6" },
-    { id: "7" },
-    { id: "8" },
-    { id: "9" },
-    { id: "10" },
-    { id: "11" },
-    { id: "12" },
-    { id: "13" },
-    { id: "14" },
-    { id: "15" },
-    { id: "16" },
-    { id: "17" },
-    { id: "18" },
-    { id: "19" },
-    { id: "20" },
-    { id: "21" },
-];
 export function Favorites({ user, setUser, playerOn, setPlayerOn, listName, setListName }) {
-const [contentVisible, setContentVisible] = useState(false);
-console.log(playerOn)
-
+    const [contentVisible, setContentVisible] = useState(false);
+    const navigate = useNavigate()
+    const [tracks, setTracks] = useState([
+        { id: "1" },
+        { id: "2" },
+        { id: "3" }])
     //redux
-const activeTrackRedux = useSelector(state => state.track.activeTrack)
-const playerOnDot = useSelector(state => state.track.playerOn)
-const myTracksRedux = useSelector(state => state.track.myTracks)
-
-console.log(playerOn)
-
-const dispatch = useDispatch();
+    const activeTrackRedux = useSelector(state => state.track.activeTrack)
+    const playerOnDot = useSelector(state => state.track.playerOn)
+    const dispatch = useDispatch();
+    async function toggleLike(id) {
+        try {
+            await delMyTracks(id);
+            const updatedTracks = await getMyTracks()
+            errorText = null;
+            setTracks(updatedTracks);
+            setContentVisible(true);
+            console.log(tracks)
+            dispatch(setMyTracksRedux({ tracks }))
+            return tracks
+                ;
+        }
+        catch (error) {
+            errorText = error.message
+            setTimeout(() => navigate("/login", { replace: true }), 1000)
+            return errorText
+        }
+    }
 
     useEffect(() => {
         setListName('Мои треки')
         getMyTracks()
             .then((data) => {
                 errorText = null;
-                tracks = data;
+                setTracks(data);
                 setContentVisible(true);
                 console.log(tracks)
-                dispatch(setMyTracksRedux({ data }))
-                return tracks;
+                dispatch(setMyTracksRedux({ tracks }))
+                // return tracks;
             })
             .catch((error) => {
                 errorText = error.message;
                 setContentVisible(true);
-                tracks = [];
+                setTracks([]);
+                setTimeout(() => navigate("/login", { replace: true }), 2000)
                 return errorText;
-            }).then((data) => {
-            });
+            })
     }, []);
     return (
-        <S.Wrapper>
+        <S.Wrapper >
             <S.Container>
                 <S.Main>
                     <Nav setUser={setUser} setPlayerOn={setPlayerOn} />
@@ -100,14 +92,14 @@ const dispatch = useDispatch();
                                 <div style={{ color: "red" }}>
                                     <h1>
                                         {errorText !== null
-                                            ? `Ошибка: ${errorText}, попробуйте позже`
+                                            ? `Ошибка: ${errorText}`
                                             : null}
                                     </h1>
                                 </div>
-
-                                {tracks.map((track) => {
+                                {tracks.map((track, index) => {
                                     return (
-                                        <S.Playlist__item key={track.id} >
+                                        <S.Playlist__item key={index} >
+                                            {/* block start */}
                                             <S.Playlist__track
                                                 onClick={(e) => {
                                                     e.preventDefault();
@@ -115,15 +107,14 @@ const dispatch = useDispatch();
                                                     dispatch(setTrackRedux({ track, tracks }))
                                                 }}
                                             >
-                                                <S.Track__title
-                                                >
+                                                <S.Track__title>
+                                                    {errorText && <h2>ERROR_{errorText}</h2>}
                                                     <S.Track__titleImage >
                                                         {contentVisible ? (<>
                                                             <S.Playlist__titleSvg_dot_Pause style={track.id === activeTrackRedux.id & playerOnDot === false ? {
                                                                 display: 'block'
                                                             } : { display: 'none' }}></S.Playlist__titleSvg_dot_Pause>
                                                             <S.Playlist__titleSvg_dot style={track.id === activeTrackRedux.id & playerOnDot === true ? { display: 'block' } : { display: 'none' }}></S.Playlist__titleSvg_dot>
-
                                                             <S.Track__titleSvg style={track.id === activeTrackRedux.id ? {
                                                                 display: 'none'
                                                             } : {}} alt="music">
@@ -183,8 +174,9 @@ const dispatch = useDispatch();
                                                 </S.Track__album>
                                                 <S.Track_time>
                                                     {contentVisible ? (
-                                                        <S.Track__timeSvg onClick={() => delMyTracks(track.id)} alt="time">
-
+                                                        <S.Track__timeSvg
+                                                            onClick={() => { toggleLike(track.id_old); console.log(track.id_old) }}
+                                                            alt="time">
                                                             {/* FAVORITES */}
                                                             <use href={`${sprite}#icon-like-liked`} />
                                                         </S.Track__timeSvg>

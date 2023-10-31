@@ -2,9 +2,8 @@ import pList01 from "./img/playlist01.png";
 import pList02 from "./img/playlist02.png";
 import pList03 from "./img/playlist03.png";
 import sprite from "./img/icon/sprite.svg";
-// import "../components/SideBar.css"
 import React, { useContext, useState } from "react";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Link } from "react-router-dom";
 import * as S from "./SideBarStyle.js";
@@ -12,10 +11,8 @@ import { UserContext } from "../../App"
 
 
 export function Sidebar() {
-
   const user = useContext(UserContext)
   console.log(user)
-
   const [contentVisible, setContentVisible] = useState(false);
   setTimeout(() => {
     setContentVisible(true);
@@ -23,13 +20,10 @@ export function Sidebar() {
 
   return (
     <S.sidebarMain className="sidebar">
-      
       <S.sidebarPersonal>
         <S.sidebarPersonalName>
           {contentVisible ? (
-            
             <span>{user[1]}:<br/>{user[0]}</span>
-            
           ) : (
             <SkeletonTheme baseColor="#202020" highlightColor="#444">
               <S.skeletonSideBar />

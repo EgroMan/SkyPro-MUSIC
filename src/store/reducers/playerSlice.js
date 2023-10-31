@@ -1,9 +1,53 @@
-import { createSlice, current } from "@reduxjs/toolkit";
-import { useState } from "react";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+
+
+export const getAllTracksRedux = createAsyncThunk(
+  'player/getAllTracksRedux',
+  async function(_,{rejectWithValue}){
+
+    try {
+      const response = await fetch('https://skypro-music-api.skyeng.tech/catalog/track/all/');
+      if (!response.ok){
+          throw new Error('server error getAllTracksRedux ')
+      
+      }
+const newData = await response.json()
+newData.forEach((el, index)=> {
+el.id =index+8})
+let data = newData
+
+return data
+
+} catch (error) {return rejectWithValue(error.message)
+  }
+  })
+export const likeTrackRedux = createAsyncThunk(
+  'player/likeTrackRedux',
+  async function(id,{rejectWithValue,dispatch}){
+    const accessToken = localStorage.getItem('access')
+    try {
+      const response = await fetch(`https://skypro-music-api.skyeng.tech/catalog/track/${id}/favorite/`,
+      {
+          
+        method: "POST",
+        headers: {
+        Authorization: `Bearer ${accessToken}`,
+},
+})
+  console.log(response)
+      if (!response.ok){
+          
+          throw new Error('server error Необходима авторизация')
+      
+      }
+  } catch (error) {return rejectWithValue(error.message)
+      
+  }
+  }
+)
 
 const playerSlice = createSlice({
-
-  name: 'player',
+  name: "player",
 
   initialState: {
     activeTrack: [],
@@ -15,122 +59,143 @@ const playerSlice = createSlice({
     playerOn: false,
     shuffle: false,
     repeat: false,
+    status:null,
+    error:null
+  },
+  extraReducers:{
+[likeTrackRedux.pending]:(state,action)=>{state.status='loading'; state.error=null;}, 
+[likeTrackRedux.fulfilled]:(state,action)=>{state.status='resolved';}, 
+[likeTrackRedux.rejected]:(state,action) =>{state.status='rejected';state.error=action.payload}, 
+[getAllTracksRedux.fulfilled]:(state,action)=>{state.status='resolved';state.tracks=action.payload; console.log(state.tracks)} 
   },
   reducers: {
     setTrackRedux(state, action) {
-      state.activeTrack = action.payload.track
-      state.tracks = action.payload.tracks
-      state.tempTracks = action.payload.tracks
-      console.log(state.tracks)
-      console.log(state.myTracks)
+      state.activeTrack = action.payload.track;
+      state.tracks = action.payload.tracks;
+      state.tempTracks = action.payload.tracks;
+      
+      console.log(state.tracks);
+      console.log(state.myTracks);
+    },
+
+    setTracksRedux(state, action) {
+      
+      state.tracks = action.payload.tracks;
+      
+      console.log(state.tracks);
     },
     setNextRedux(state, action) {
-      let next = state.activeTrack.id - 7
+      let next = state.activeTrack.id - 7;
+
       if (state.tracks.length > 1) {
         if (next - state.tracks.length === 0) {
-          { state.activeTrack = state.tracks[state.tracks.length - (state.tracks.length)]; }
+          {
+            state.activeTrack =
+              state.tracks[state.tracks.length - state.tracks.length];
+          }
+        } else {
+          state.activeTrack = state.tracks[next];
         }
-        else {
-          state.activeTrack = state.tracks[next]
-        }
-      } else { state.activeTrack = state.tracks[state.tracks.length - 1] }
+      } else {
+        state.activeTrack = state.tracks[state.tracks.length - 1];
+      }
     },
     setPrevRedux(state) {
-      let prev = state.activeTrack.id - 9
-      let prevId = state.tracks.length - 1
+      let prev = state.activeTrack.id - 9;
+      let prevId = state.tracks.length - 1;
       if (state.tracks.length > 1) {
         if (prev < 0) {
-          state.activeTrack = state.tracks[prevId]
+          state.activeTrack = state.tracks[prevId];
+        } else {
+          state.activeTrack = state.tracks[prev];
         }
-        else { state.activeTrack = state.tracks[prev] }
-      } else { state.activeTrack = state.tracks[state.tracks.length - 1] }
+      } else {
+        state.activeTrack = state.tracks[state.tracks.length - 1];
+      }
     },
     setProgressRedux(state, action) {
-      let next = state.activeTrack.id - 7
-      state.trackProgressTime = action.payload
+      let next = state.activeTrack.id - 7;
+      state.trackProgressTime = action.payload;
 
-      let deltaTime = Math.round((state.trackTime - state.trackProgressTime) * 100) / 100
-      if (deltaTime <= 1 & state.repeat === false) {
-        console.log('repeat true')
+      let deltaTime =
+        Math.round((state.trackTime - state.trackProgressTime) * 100) / 100;
+
+      if ((deltaTime <= 1) & (state.repeat === false)) {
+        
 
         if (next - state.tracks.length === 0) {
-          state.activeTrack = state.tracks[state.tracks.length - state.tracks.length]
-          ; console.log(state.activeTrack)
+          state.activeTrack =
+            state.tracks[state.tracks.length - state.tracks.length];
+          console.log(state.activeTrack);
         } else {
-
-          if (state.repeat === true) { console.log('trrru'); state.activeTrack = state.activeTrack } else {
-            console.log('????')
-            state.activeTrack = state.tracks[next]
+          if (state.repeat === true) {
+            
+            state.activeTrack = state.activeTrack;
+          } else {
+            
+            state.activeTrack = state.tracks[next];
           }
         }
       }
     },
     setTimeRedux(state, action) {
-      state.trackTime = action.payload
-      console.log(state.trackTime)
-
-
+      state.trackTime = action.payload;
+      console.log(state.trackTime);
     },
 
     setShuffleRedux(state) {
-      state.shuffle = true
-      state.tracks = state.tracks.sort(() => Math.random() - 0.5)
-      console.log(state.tempTracks)
-
-
+      state.shuffle = true;
+      state.tracks = state.tracks.sort(() => Math.random() - 0.5);
+      console.log(state.tempTracks);
     },
     setNotShuffleRedux(state) {
-      state.shuffle = false
-      state.tracks = state.tempTracks
-      console.log(state.tracks)
-
+      state.shuffle = false;
+      state.tracks = state.tempTracks;
+      console.log(state.tracks);
     },
 
     setOnDotRedux(state) {
-      state.playerOn = true
-      console.log(state.playerOn)
-
+      state.playerOn = true;
+      console.log(state.playerOn);
     },
     setOffDotRedux(state) {
-      state.playerOn = false
-      console.log(state.playerOn)
-
+      state.playerOn = false;
+      console.log(state.playerOn);
     },
     setCycleRedux(state) {
-
-
       if (state.repeat === false) {
-
-        state.repeat = true
-        console.log(state.repeat)
+        state.repeat = true;
+        // state.tracks=[state.activeTrack]
+        console.log(state.repeat);
       } else {
-
-        state.repeat = false
-        console.log(state.repeat)
+        state.repeat = false;
+        // state.tracks=state.tempTracks
+        console.log(state.repeat);
       }
     },
-
     setMyTracksRedux(state, action) {
-      state.myTracks = action.payload.data
-
-      console.log(state.myTracks)
+      state.myTracks = action.payload.data;
+      console.log(state.myTracks);
     },
-  }
-})
-export const
-  {
-    setTrackRedux,
-    setNextRedux,
-    setPrevRedux,
-    setProgressRedux,
-    setTimeRedux,
-    setShuffleRedux,
-    setNotShuffleRedux,
-    setOnDotRedux,
-    setOffDotRedux,
-    setCycleRedux,
-    setMyTracksRedux,
-    setLikedStatusRedux
-  } = playerSlice.actions
+    
+  },
+});
+
+export const {
+  setTrackRedux,
+  setNextRedux,
+  setPrevRedux,
+  setProgressRedux,
+  setTimeRedux,
+  setShuffleRedux,
+  setNotShuffleRedux,
+  setOnDotRedux,
+  setOffDotRedux,
+  setCycleRedux,
+  setMyTracksRedux,
+  setLikedStatusRedux,
+  setTrackIsLiked,
+  setTracksRedux
+} = playerSlice.actions;
 
 export default playerSlice.reducer;
