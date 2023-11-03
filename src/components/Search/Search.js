@@ -14,9 +14,9 @@ export function Search({ tracks, setTracks }) {
   const [searchText, setSearchText] = useState()
   const dispatch = useDispatch()
   const param = useParams()
-  console.log(param)
+  // console.log(param)
   let page = param.id
-  console.log(page)
+  // console.log(page)
   let resultSearch;
 
 

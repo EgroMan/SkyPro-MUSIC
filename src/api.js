@@ -98,9 +98,9 @@ export async function getMyTracks() {
     const newData = await response.json()
     newData.forEach((el, index) => {
         el.id_old = el.id
-        console.log(el.id_old)
+        // console.log(el.id_old)
         el.id = index + 8;
-        console.log(el.id)
+        // console.log(el.id)
     })
     let data = newData
     return data
@@ -135,7 +135,7 @@ export async function delMyTracks(id_old) {
 
 export async function refreshToken() {
     let refreshToken = localStorage.getItem('refresh')
-    console.log(refreshToken)
+    // console.log(refreshToken)
     try {
         const response = await fetch("https://skypro-music-api.skyeng.tech/user/token/refresh/", {
             method: "POST",
@@ -150,7 +150,7 @@ export async function refreshToken() {
         const newToken = await response.json()
         localStorage.setItem('access', newToken.access)
         const newAccessToken = localStorage.getItem('access')
-        console.log(newAccessToken)
+        // console.log(newAccessToken)
         return newAccessToken
     } catch (error) {
         alert('требуется ввод логина и пароля')

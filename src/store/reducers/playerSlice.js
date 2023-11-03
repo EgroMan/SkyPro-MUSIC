@@ -76,22 +76,22 @@ const playerSlice = createSlice({
 setSearchResults(state, action){
   state.searchResults = action.payload
   state.tracks = action.payload
-  console.log(state.searchResults);
-  console.log(state.tracks)
+  // console.log(state.searchResults);
+  // console.log(state.tracks)
 },
     setTrackRedux(state, action) {
       state.activeTrack = action.payload.track;
       state.tracks = action.payload.tracks;
       state.tempTracks = action.payload.tracks;
       
-      console.log(state.tracks);
-      console.log(state.myTracks);
+      // console.log(state.tracks);
+      // console.log(state.myTracks);
     },
     setTracksRedux(state, action) {
       
       state.tracks = action.payload
       state.searchBase = action.payload;
-      console.log(state.searchBase);
+      // console.log(state.searchBase);
     },
     setNextRedux(state, action) {
       let next = state.activeTrack.id - 7;
@@ -144,38 +144,38 @@ setSearchResults(state, action){
     },
     setTimeRedux(state, action) {
       state.trackTime = action.payload;
-      console.log(state.trackTime);
+      // console.log(state.trackTime);
     },
     setShuffleRedux(state) {
       state.shuffle = true;
       state.tracks = state.tracks.sort(() => Math.random() - 0.5);
-      console.log(state.tempTracks);
+      // console.log(state.tempTracks);
     },
     setNotShuffleRedux(state) {
       state.shuffle = false;
       state.tracks = state.tempTracks;
-      console.log(state.tracks);
+      // console.log(state.tracks);
     },
     setOnDotRedux(state) {
       state.playerOn = true;
-      console.log(state.playerOn);
+      // console.log(state.playerOn);
     },
     setOffDotRedux(state) {
       state.playerOn = false;
-      console.log(state.playerOn);
+      // console.log(state.playerOn);
     },
     setCycleRedux(state) {
       if (state.repeat === false) {
         state.repeat = true;
-        console.log(state.repeat);
+        // console.log(state.repeat);
       } else {
         state.repeat = false;
-        console.log(state.repeat);
+        // console.log(state.repeat);
       }
     },
     setMyTracksRedux(state, action) {
       state.myTracks = action.payload;
-      console.log(state.myTracks);
+      // console.log(state.myTracks);
     },
     
   },
