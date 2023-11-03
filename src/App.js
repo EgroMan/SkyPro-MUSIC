@@ -5,7 +5,6 @@ import { Player } from "./components/Audioplayer/AudioPlayer";
 import { Nav } from "./components/Navmenu/NavMenu";
 export const UserContext = React.createContext(null);
 
-
 const GlobalStyle = createGlobalStyle`
 
   *{margin: 0;
@@ -49,23 +48,24 @@ const GlobalStyle = createGlobalStyle`
 export function App() {
   const [playerOn, setPlayerOn] = useState("hidden");
   const [user, setUser] = useState(false);
-  const [userName, setUserName]=useState(null)
-  const [userPass, setUserPass]=useState(null)
-  const [isLoginMode, setIsLoginMode]=useState(true)
-  const [listName, setListName]=useState('Tracks')
-  
-  let userLoginName= localStorage.getItem('userName')
-  let textName= 'Имя пользователя:'
-  let arrNameUser=[userLoginName,textName]
+  const [userName, setUserName] = useState(null)
+  const [userPass, setUserPass] = useState(null)
+  const [isLoginMode, setIsLoginMode] = useState(true)
+  const [listName, setListName] = useState('Tracks')
+  const [tracks, setTracks] = useState([{ id: "1" }])
+  let userLoginName = localStorage.getItem('userName')
+  let textName = 'Имя пользователя:'
+  let arrNameUser = [userLoginName, textName]
 
   return (
     <div className="App">
-    <UserContext.Provider value={arrNameUser}>
-    
-      <AppRoutes listName={listName} setListName={setListName} isLoginMode={isLoginMode}  setIsLoginMode={setIsLoginMode} setUserPass={setUserPass} setUserName={setUserName} user={user} setUser={setUser} playerOn={playerOn}setPlayerOn={setPlayerOn}/>
-      <Player playerVisibility = {playerOn} 
-      />
-    </UserContext.Provider> 
+      <UserContext.Provider value={arrNameUser}>
+        <AppRoutes
+          tracks={tracks} setTracks={setTracks}
+          listName={listName} setListName={setListName} isLoginMode={isLoginMode} setIsLoginMode={setIsLoginMode} setUserPass={setUserPass} setUserName={setUserName} user={user} setUser={setUser} playerOn={playerOn} setPlayerOn={setPlayerOn} />
+        <Player playerVisibility={playerOn}
+        />
+      </UserContext.Provider>
       <GlobalStyle />
     </div>
   );

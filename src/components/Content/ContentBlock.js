@@ -8,41 +8,18 @@ import { UserContext } from "../../App"
 //redux
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { setTrackRedux, getAllTracksRedux, likeTrackRedux } from "../../store/reducers/playerSlice";
+import { setTrackRedux, setTracksRedux } from "../../store/reducers/playerSlice";
 import { useNavigate } from "react-router-dom";
 
 
 let errorText = null;
 let liked = false;
-export function Content({ playerOn, setPlayerOn, user, setUser }) {
+
+export function Content({ playerOn, setPlayerOn, user, setUser, tracks, setTracks }) {
   const [contentVisible, setContentVisible] = useState(false);
-  // const [liked, setLiked] = useState(null);
   const [error, setError] = useState(null)
   const userName = useContext(UserContext)
   const navigate = useNavigate()
-  const [tracks, setTracks] = useState([
-    { id: "1" },
-    { id: "2" },
-    { id: "3" },
-    { id: "4" },
-    { id: "5" },
-    { id: "6" },
-    { id: "7" },
-    { id: "8" },
-    { id: "9" },
-    { id: "10" },
-    { id: "11" },
-    { id: "12" },
-    { id: "13" },
-    { id: "14" },
-    { id: "15" },
-    { id: "16" },
-    { id: "17" },
-    { id: "18" },
-    { id: "19" },
-    { id: "20" },
-    { id: "21" },])
-
 
 
   //redux
@@ -81,6 +58,7 @@ export function Content({ playerOn, setPlayerOn, user, setUser }) {
       .then((data) => {
         errorText = null;
         setTracks(data);
+        dispatch(setTracksRedux(data));
         setContentVisible(true);
         return tracks;
       })
@@ -133,7 +111,6 @@ export function Content({ playerOn, setPlayerOn, user, setUser }) {
                 <S.Track__title>
                   <S.Track__titleImage >
                     {contentVisible ? (<>
-
                       <S.Playlist__titleSvg_dot_Pause style={track.id === activeTrackRedux.id & playerOnDot === false ? {
                         display: 'block'
                       } : { display: 'none' }}></S.Playlist__titleSvg_dot_Pause>
@@ -201,7 +178,6 @@ export function Content({ playerOn, setPlayerOn, user, setUser }) {
                       likes(track) !== track.id ? renderLikes(track.id) : renderDisLikes(track.id)
                       console.log('ADD CLICK')
                     }} alt="time">
-
                       <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
                       <use href={
                         likes(track) === track.id ? `${sprite}#icon-like-liked` : `${sprite}#icon-like`

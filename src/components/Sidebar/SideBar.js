@@ -17,7 +17,6 @@ export function Sidebar() {
   setTimeout(() => {
     setContentVisible(true);
   }, 4000);
-
   return (
     <S.sidebarMain className="sidebar">
       <S.sidebarPersonal>
@@ -41,7 +40,10 @@ export function Sidebar() {
       <S.sidebarBlock>
         <S.sidebarList>
           <S.sidebarItem>
-            <S.sidebarLink to="category/1">
+            <S.sidebarLink 
+            
+            to={"/category/1"}
+            >
               {contentVisible ? (
                 <S.sidebarImg src={pList01} alt="day's playlist" />
               ) : (
@@ -52,7 +54,7 @@ export function Sidebar() {
             </S.sidebarLink>
           </S.sidebarItem>
           <S.sidebarItem>
-            <S.sidebarLink to={'/category/2'}>
+            <S.sidebarLink to={"/category/2"}>
               {contentVisible ? (
                 <S.sidebarImg src={pList02} alt="day's playlist" />
               ) : (
@@ -63,7 +65,7 @@ export function Sidebar() {
             </S.sidebarLink>
           </S.sidebarItem>
           <S.sidebarItem>
-            <S.sidebarLink to="category/3">
+            <S.sidebarLink to={"/category/3"}>
               {contentVisible ? (
                 <S.sidebarImg src={pList03} alt="day's playlist" />
               ) : (

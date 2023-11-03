@@ -9,18 +9,23 @@ import { Account } from "./Pages/Account/index";
 import { ProtectedRoute } from "./components/protected/index";
 import AuthPage from "./Pages/loginPage/AuthPage";
 import AuthPageReg from "./Pages/loginPage/registration";
-export function AppRoutes ({user, setUser,playerOn, setPlayerOn, setUserName, setUserPass, isLoginMode,setIsLoginMode, listName, setListName}){
+
+
+export function AppRoutes ({user, setUser,playerOn, setPlayerOn, setUserName, setUserPass, isLoginMode,setIsLoginMode, listName, setListName, tracks, setTracks}){
     console.log(Boolean(user))
 return(
 <Routes>
 <Route  path="*" element ={<ErrPage/>}/>
 <Route  path="/login" element ={<AuthPage isLoginMode={isLoginMode} setIsLoginMode={setIsLoginMode} setUserPass={setUserPass} user={user} setUser={setUser} setUserName={setUserName} />}/>
-
 <Route element ={<ProtectedRoute isAllowed={Boolean(user)}/>}>
 <Route path="/account" element = {<Account/>}/>
-<Route  path="/favorites" element ={<Favorites listName={listName} setListName={setListName} user={user} setUser={setUser} playerOn={playerOn} setPlayerOn={setPlayerOn}/>}/>
-<Route  path="/category/:id" element ={<PlayListPage/>}/>
-<Route  path="/" element ={<MainPage listName={listName} setListName={setListName} user={user} setUser={setUser} playerOn={playerOn} setPlayerOn={setPlayerOn}/>}/>
+<Route  path="/:id" element ={<Favorites
+tracks={tracks} setTracks={setTracks} 
+listName={listName} setListName={setListName} user={user} setUser={setUser} playerOn={playerOn} setPlayerOn={setPlayerOn}/>}/>
+<Route  path="/category/:id" element ={<PlayListPage listName={listName} setListName={setListName} setPlayerOn={setPlayerOn}/>}/>
+<Route  path="/" element ={<MainPage
+tracks={tracks} setTracks={setTracks}  
+listName={listName} setListName={setListName} user={user} setUser={setUser} playerOn={playerOn} setPlayerOn={setPlayerOn}/>}/>
 </Route>
 </Routes>
 )

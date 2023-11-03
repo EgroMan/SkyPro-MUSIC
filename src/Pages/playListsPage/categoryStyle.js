@@ -5,7 +5,15 @@ import {useSelector} from "react-redux";
 
 
 //main
-
+export const CentralBlockContent = styled.div`
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+`;
 
 export const Main=styled.div`
 -webkit-box-flex: 1;
