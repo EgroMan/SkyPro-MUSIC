@@ -273,8 +273,8 @@ export const Track__albumLink = styled.div`
 export const Track_time = styled.div``;
 
 export const Track__timeSvg = styled.svg`
-  width: 14px;
-  height: 12px;
+  width: 18px;
+  height: 14px;
   margin-right: 17px;
   fill: transparent;
   stroke: #696969;
