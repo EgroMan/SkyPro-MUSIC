@@ -1,5 +1,4 @@
 import { useState } from "react";
-// import "../Filter/FilterBlock.css"
 import React from "react";
 import * as S from "./FilterStyles.js";
 
@@ -8,7 +7,6 @@ export function Filter() {
   return (
     <S.centralBlockFilter className="filter">
       <S.centralBlockFilterTitle>Искать по:</S.centralBlockFilterTitle>
-
       <S.filterBlockPerformer>
         <div className="filter_performer">
           <S.centralBlockFilterButton
@@ -16,7 +14,6 @@ export function Filter() {
               activeFilter === "author"
                 ? setActiveFilter("")
                 : setActiveFilter("author");
-              console.log(`click`);
             }}
             className="_btn-text"
           >
@@ -62,7 +59,6 @@ export function Filter() {
           ) : null}
         </div>
       </S.filterBlockPerformer>
-
       <S.filterBlockYear>
         <div className="filter_performer">
           <S.centralBlockFilterButton
@@ -70,7 +66,6 @@ export function Filter() {
               activeFilter === "year"
                 ? setActiveFilter("")
                 : setActiveFilter("year");
-              console.log(`click-y`);
             }}
             className="_btn-text"
           >
@@ -106,19 +101,12 @@ export function Filter() {
               activeFilter === "style"
                 ? setActiveFilter("")
                 : setActiveFilter("style");
-              console.log(`click`);
             }}
             className="_btn-text"
           >
             жанру
           </S.centralBlockFilterButton>
         </div>
-
-        {/* <div className="filter_style">
-    <S.centralBlockFilterButton onClick={()=>{activeFilter==='style'?setActiveFilter('') :setActiveFilter('style')
-console.log(`click`)}} className="_btn-text">жанру</S.centralBlockFilterButton>
-  </div>  */}
-
         <div>
           <S.styleFilterUl isactive ={ activeFilter === "style"? "style": null }>
             <li>
@@ -134,13 +122,6 @@ console.log(`click`)}} className="_btn-text">жанру</S.centralBlockFilterBut
               <S.filterBlockLink href="#">Жанр муз4</S.filterBlockLink>
             </li>
           </S.styleFilterUl>
-
-          {/* <ul className={activeFilter === 'style' ? 'display_yes':'display_no'} >
-    <li><a className="link"href="#">Жанр муз1</a></li>
-    <li><a className="link"href="#">Жанр муз2</a></li>
-    <li><a className="link"href="#">Жанр муз3</a></li>
-    <li><a className="link"href="#">Жанр муз4</a></li>
-    </ul> */}
         </div>
       </S.filterBlockStyle>
     </S.centralBlockFilter>

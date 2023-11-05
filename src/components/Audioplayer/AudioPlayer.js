@@ -1,15 +1,16 @@
 import sprite from "./sprite.svg";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "react-loading-skeleton/dist/skeleton.css";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "../../img/icon/play.svg";
 import * as S from "./PlayerStyles";
-import { getTracks } from "../../api";
-
-//redux
+import { getMyTracks, getTracks } from "../../api";
+import { UserContext } from "../../App"
+import { useNavigate, useParams } from "react-router-dom";
+import { addMyTracks, delMyTracks } from "../../api";
 
 import { useSelector } from "react-redux";
-import { 
+import {
   setNextRedux,
   setPrevRedux,
   setTimeRedux,
@@ -18,14 +19,17 @@ import {
   setNotShuffleRedux,
   setOnDotRedux,
   setOffDotRedux,
-  setCycleRedux} from "../../store/reducers/playerSlice";
+  setCycleRedux,
+  setTrackRedux,
+  setTracksRedux,
+  setMyTracksRedux
+} from "../../store/reducers/playerSlice";
 import { useDispatch } from "react-redux";
 
+export function Player({ playerVisibility, tracks, setTracks, status, setStatus }) {
 
-export function Player({playerVisibility}) {
-
-  
-
+  const [liked, setLiked] = useState()
+  const param = useParams()
   const realPlayer = useRef(null);
   const [playerOn, setPlayerOn] = useState(false);
   const [loopOn, setLoopOn] = useState(false);
@@ -33,44 +37,61 @@ export function Player({playerVisibility}) {
   const [progressOn, setProgressOn] = useState(0);
   const [trackTime, setTrackTime] = useState(0);
   const [mix, setMixOn] = useState(false);
-  
+  const userName = useContext(UserContext)
 
-  
- 
-//redux
-const activeTrackRedux = useSelector(state=>state.track.activeTrack)
-const dispatch=useDispatch()
+  const tracksRedux = useSelector(state => state.track.tracks)
+
+  const activeTrackRedux = useSelector(state => state.track.activeTrack)
+  const isLikedRedux = useSelector(state => state.track.isLiked)
+  const myTracks = useSelector(state => state.track.myTracks)
+  console.log(myTracks)
+  const dispatch = useDispatch()
+  let activeTrack = activeTrackRedux
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    renderTracks()
+    likes()
+    console.log('i work');
 
 
-let activeTrack = activeTrackRedux
+    if (!playerOn) {
+      setTimeout(() => {
+        realPlayer?.current.addEventListener("timeupdate", () => {
+          setProgressOn(realPlayer.current.currentTime);
+          dispatch(setProgressRedux(realPlayer.current.currentTime))
 
+        });
+      }, 1);
+      setTimeout(() => {
+        realPlayer?.current.addEventListener("loadedmetadata", () => {
+          setTrackTime(realPlayer.current.duration);
 
-useEffect(() => {
-    if(!playerOn){
-    setTimeout(() => {
-      realPlayer?.current.addEventListener("timeupdate", () => {
-        setProgressOn(realPlayer.current.currentTime);
-         dispatch(setProgressRedux(realPlayer.current.currentTime))
-      });
-    }, 1);
-    setTimeout(() => {
-      realPlayer?.current.addEventListener("loadedmetadata", () => {
-        setTrackTime(realPlayer.current.duration);
-        
-         dispatch(setTimeRedux(realPlayer.current.duration))
-      });
-    }, 1);
+          dispatch(setTimeRedux(realPlayer.current.duration))
+        });
+      }, 1);
 
-    return () => {
-      realPlayer.current.removeEventListener("timeupdate", () => {
-        setProgressOn(realPlayer.current.currentTime);
-      });
-      realPlayer?.current.removeEventListener("loadedmetadata", () => {
-        setTrackTime(realPlayer.current.duration);
-      });
-    };
-}
-}, []);
+      return () => {
+        realPlayer.current.removeEventListener("timeupdate", () => {
+          setProgressOn(realPlayer.current.currentTime);
+        });
+        realPlayer?.current.removeEventListener("loadedmetadata", () => {
+          setTrackTime(realPlayer.current.duration);
+        });
+      };
+    }
+
+  }, [activeTrack, status
+  ]);
+
+  function triggerLikes() {
+    if (liked === true) { }
+    if (liked !== true) { setLiked(true) }
+  }
+  function triggerDisLikes() {
+    if (liked === true) { setLiked(false) }
+    if (liked !== true) { }
+  }
   const clickPlayerStart = () => {
     realPlayer?.current.play();
     setPlayerOn(true);
@@ -85,41 +106,75 @@ useEffect(() => {
     realPlayer.current.loop = true;
     setLoopOn(true);
     dispatch(setCycleRedux())
-    console.log(activeTrack)
-
-    console.log(activeTrack.id)
-    console.log(activeTrack[0])
   };
   const clickPlayerLoopOff = () => {
     realPlayer.current.loop = false;
     setLoopOn(false);
-     dispatch(setCycleRedux())
+    dispatch(setCycleRedux())
   };
 
   const clickPlayerShuffleOn = () => {
     dispatch(setShuffleRedux())
-   
     setMixOn(true);
   };
   const clickPlayerShuffleOff = () => {
     dispatch(setNotShuffleRedux())
-   
     setMixOn(false);
   };
-
-
   const [contentVisible, setContentVisible] = useState(false);
   setTimeout(() => {
     setContentVisible(true);
   }, 500);
 
-if(playerOn){
-  realPlayer.current.play();
-}
+  if (playerOn) {
+    realPlayer.current.play();
+  }
+  console.log(activeTrackRedux)
 
+  function renderLikes(id) {
+    addMyTracks(id).then(() => { renderTracks() }
+    ).catch((err) => {
+      console.log(err.message)
+    })
+  }
+  function renderDisLikes(id) {
+    delMyTracks(id).then(() => renderTracks()
+    ).catch((err) => {
+      console.log(err.message)
+    })
+  }
+  function renderTracks() {
 
+    getTracks()
+      .then((data) => {
+        setTracks(data);
+        dispatch(setTracksRedux(data));
+        setContentVisible(true);
+      }).then(() => {
+        getMyTracks().then((data) => { dispatch(setMyTracksRedux(data)) })
 
-  return ( 
+        .catch((error) => {
+          setContentVisible(true);
+          localStorage.removeItem('userName')
+          navigate("/login", { replace: true })
+        })
+
+      })
+      .catch((error) => {
+        setContentVisible(true);
+        localStorage.removeItem('userName')
+        navigate("/login", { replace: true })
+      })
+  }
+  function likes() {
+    console.log(activeTrack)
+    console.log(myTracks)
+    let likedTrack = myTracks.find(item => item.name === activeTrack.name)
+    setLiked(Boolean(likedTrack))
+    console.log(Boolean(likedTrack))
+  }
+
+  return (
     <S.bar style={{ visibility: `${playerVisibility}` }}>
       <S.barContent>
         <audio
@@ -153,18 +208,17 @@ if(playerOn){
             <S.playerControls>
               <S.playerBtnPrev>
                 <S.playerBtnPrevSvg
-                  onClick={()=>{dispatch(setPrevRedux())}}
+                  onClick={() => { dispatch(setPrevRedux()) }}
                   alt="prev"
                 >
                   <use xlinkHref="img/icon/sprite.svg#icon-prev"></use>
                   <use href={`${sprite}#icon-prev`} />
                 </S.playerBtnPrevSvg>
               </S.playerBtnPrev>
-
               <S.playerBtnPlay className="_btn">
                 <S.playerBtnPlaySvg
                   onClick={
-                    playerOn ? clickPlayerStop :  clickPlayerStart          
+                    playerOn ? clickPlayerStop : clickPlayerStart
                   }
                   alt="play"
                 >
@@ -177,7 +231,7 @@ if(playerOn){
               </S.playerBtnPlay>
               <S.playerBtnNext>
                 <S.playerBtnNextSvg
-                  onClick={ ()=>{dispatch(setNextRedux())}}                            //
+                  onClick={() => { dispatch(setNextRedux()) }}
                   alt="next">
                   <use xlinkHref="img/icon/sprite.svg#icon-next"></use>
                   <use href={`${sprite}#icon-next`} />
@@ -189,16 +243,19 @@ if(playerOn){
                   alt="repeat"
                 >
                   <use
-                    href={loopOn ? `${sprite}#loopOn` : `${sprite}#icon-repeat`}                   
+                    href={loopOn ? `${sprite}#loopOn` : `${sprite}#icon-repeat`}
+
+
+
                   />
                 </S.playerBtnRepeatSvg>
               </S.playerBtnRepeat>
-              <S.playerBtnShuffle  className=" _btn-icon">
+              <S.playerBtnShuffle className=" _btn-icon">
                 <S.playerBtnShuffleSvg
-                  onClick={  mix ? clickPlayerShuffleOff : clickPlayerShuffleOn }
+                  onClick={mix ? clickPlayerShuffleOff : clickPlayerShuffleOn}
                   alt="shuffle"
                 >
-                  <use href={mix?`${sprite}#icon-shuffle-off`: `${sprite}#icon-shuffle`} />
+                  <use href={mix ? `${sprite}#icon-shuffle-off` : `${sprite}#icon-shuffle`} />
                 </S.playerBtnShuffleSvg>
               </S.playerBtnShuffle>
             </S.playerControls>
@@ -243,13 +300,18 @@ if(playerOn){
                 </S.playerTrackPlayAlbum>
               </S.playerTrackPlayContain>
               <S.playerTrackPlayLkeDislike>
-                <S.playerTrackPlayLke className=" _btn-icon">
+                <S.playerTrackPlayLke onClick={() => {
+                  console.log('like'); renderLikes(activeTrack.id); triggerLikes()
+
+                }} className=" _btn-icon">
                   <S.playerTrackPlayLikeSvg alt="like">
-                    <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
-                    <use href={`${sprite}#icon-like`} />
+                    <use href={
+                      liked ? `${sprite}#icon-like-liked` : `${sprite}#icon-like`
+                    } />
+                    {console.log(activeTrackRedux.stared_user)}
                   </S.playerTrackPlayLikeSvg>
                 </S.playerTrackPlayLke>
-                <S.playerTrackPlayDisLke className="_btn-icon">
+                <S.playerTrackPlayDisLke onClick={() => { console.log('disLike'); renderDisLikes(activeTrack.id); triggerDisLikes() }} className="_btn-icon">
                   <S.playerTrackPlayDisLikeSvg alt="dislike">
                     <use xlinkHref="img/icon/sprite.svg#icon-dislike"></use>
                     <use href={`${sprite}#icon-dislike`} />
@@ -272,7 +334,7 @@ if(playerOn){
                     let volumeRange = e.target.value / 100;
                     realPlayer.current.volume = volumeRange;
                     setVolumeOn(volumeRange);
-                    
+
                   }}
                   className="_btn"
                   type="range"
@@ -284,7 +346,7 @@ if(playerOn){
         </S.playerBlock>
       </S.barContent>
     </S.bar>
-    
+
   );
-  
-}
+
+} 

@@ -8,14 +8,14 @@ import { UserContext } from "../../App"
 //redux
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { setTrackRedux, setTracksRedux } from "../../store/reducers/playerSlice";
+import { setTrackRedux, setTracksRedux, setIsLiked } from "../../store/reducers/playerSlice";
 import { useNavigate } from "react-router-dom";
 
 
 let errorText = null;
 let liked = false;
 
-export function Content({ playerOn, setPlayerOn, user, setUser, tracks, setTracks }) {
+export function Content({ status, setStatus, playerOn, setPlayerOn, user, setUser, tracks, setTracks }) {
   const [contentVisible, setContentVisible] = useState(false);
   const [error, setError] = useState(null)
   const userName = useContext(UserContext)
@@ -27,27 +27,18 @@ export function Content({ playerOn, setPlayerOn, user, setUser, tracks, setTrack
   const playerOnDot = useSelector(state => state.track.playerOn)
   const dispatch = useDispatch();
 
-
-
   function likes(track) {
     for (let index_user = 0; index_user < track.stared_user.length; index_user++) {
       let likName = track.stared_user[index_user].username
-
       let un = userName
-
-
       if (likName === un[0]) {
-
         return track.id
-
       }
     }
-
   }
   function renderLikes(id) {
     addMyTracks(id).then(() => renderTracks()
     ).catch((err) => {
-      // localStorage.removeItem('userName');
       setError(err.message);
       setTimeout(() => navigate("/login", { replace: true }), 2000)
     })
@@ -59,15 +50,14 @@ export function Content({ playerOn, setPlayerOn, user, setUser, tracks, setTrack
     })
   }
 
-
   function renderTracks() {
-
     getTracks()
       .then((data) => {
         errorText = null;
         setTracks(data);
         dispatch(setTracksRedux(data));
         setContentVisible(true);
+        status ? setStatus(false) : setStatus(true);
         return tracks;
 
       })
@@ -76,21 +66,13 @@ export function Content({ playerOn, setPlayerOn, user, setUser, tracks, setTrack
         setContentVisible(true);
         setTracks([]);
         localStorage.removeItem('userName')
-        // setUser(false);
-        // console.log('REDIRECT /')
-        // navigate("/",{replace:true})
         return errorText;
       })
   }
 
-
   useEffect(() => {
-
     renderTracks()
-  }, []);
-
-
-
+  }, [dispatch]);
   return (
     <S.CentralBlockContent>
 
@@ -150,7 +132,6 @@ export function Content({ playerOn, setPlayerOn, user, setUser, tracks, setTrack
                   <S.Track_titleText>
                     <S.Track__titleLink
                       onClick={() => {
-                        console.log("player load ?");
                       }}
                       className="trackNameLink"
                       href="http://"
@@ -194,10 +175,13 @@ export function Content({ playerOn, setPlayerOn, user, setUser, tracks, setTrack
                 <S.Track_time>
                   {contentVisible ? (
                     <S.Track__timeSvg onClick={() => {
-                      likes(track) !== track.id ? renderLikes(track.id) : renderDisLikes(track.id)
-                      console.log('ADD CLICK')
-                    }} alt="time">
-                      <use xlinkHref="./sprite.svg#icon-like"></use>
+                      likes(track) !== track.id ? renderLikes(track.id) : renderDisLikes(track.id);
+                      console.log('wor11111');
+                      dispatch(setTrackRedux({ track, tracks }))
+                    }
+
+                    } alt="time">
+                      <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
                       <use href={
                         likes(track) === track.id ? `${sprite}#icon-like-liked` : `${sprite}#icon-like`
                       } />

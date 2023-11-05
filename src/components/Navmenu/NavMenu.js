@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import logo from "./logo.png";
-// import "./NavMenu.css"
 import * as S from "./NavStyle.js";
 import { Link } from "react-router-dom";
 
@@ -8,9 +7,6 @@ export function Nav({setUser, setPlayerOn}) {
   const [menuVisible, setVisible] = useState(false);
   const menuClick = () => {
     setVisible(!menuVisible);
-    console.log(menuVisible);
-    console.log(setUser);
-    console.log(setPlayerOn);
   };
 
   return (
@@ -28,9 +24,7 @@ export function Nav({setUser, setPlayerOn}) {
         <S.NavMenu>
           <S.MenuList>
             <S.MenuItem>
-            {/* <Link to ="/login">Главное2</Link> */}
             <S.MenuLink to ="/">Главное</S.MenuLink>
-              {/* <S.MenuLink href="#">Главное</S.MenuLink> */}
             </S.MenuItem>
             <S.MenuItem>
               <S.MenuLink to ="/favorites">Мой плейлист</S.MenuLink>

@@ -62,11 +62,9 @@ export async function login(email, password) {
         }).catch((error) => { alert(error.message) })
     getToken(email, password).then((response) => { let data = response.json(); return data })
         .then((data) => {
-            console.log(data)
             localStorage.setItem('access', data.access)
             localStorage.setItem('refresh', data.refresh)
             refresh = localStorage.getItem('refresh')
-            console.log(refresh)
         })
     return response
 }
@@ -86,7 +84,7 @@ export async function getToken(email, password) {
     return response
 }
 
-export async function getMyTracks() {
+export async function getMyTracks(username) {
     const accessToken = localStorage.getItem('access')
     const response = await fetch("https://skypro-music-api.skyeng.tech/catalog/track/favorite/all/", {
         method: "GET",
@@ -94,20 +92,21 @@ export async function getMyTracks() {
             Authorization: `Bearer ${accessToken}`,
         },
     })
-    if (response.status === 401) { throw new Error('Нужна авторизация') }
+    if (response.status === 401) { throw new Error('Нужна авторизация2') }
+
     const newData = await response.json()
     newData.forEach((el, index) => {
+        el.stared_user = username
         el.id_old = el.id
-        // console.log(el.id_old)
+        console.log(el.id_old)
         el.id = index + 8;
-        // console.log(el.id)
+        console.log(el.id)
     })
     let data = newData
     return data
 }
 
 export async function addMyTracks(id) {
-    console.log('add my tracks')
     const accessToken = localStorage.getItem('access')
     const response = await fetch(`https://skypro-music-api.skyeng.tech/catalog/track/${id}/favorite/`, {
         method: "POST",
@@ -120,8 +119,8 @@ export async function addMyTracks(id) {
     return data
 }
 
-export async function delMyTracks(id_old) {
 
+export async function delMyTracks(id_old) {
     const accessToken = localStorage.getItem('access')
     const response = await fetch(`https://skypro-music-api.skyeng.tech/catalog/track/${id_old}/favorite/`, {
         method: "DELETE",
@@ -135,7 +134,6 @@ export async function delMyTracks(id_old) {
 
 export async function refreshToken() {
     let refreshToken = localStorage.getItem('refresh')
-    // console.log(refreshToken)
     try {
         const response = await fetch("https://skypro-music-api.skyeng.tech/user/token/refresh/", {
             method: "POST",
@@ -143,14 +141,12 @@ export async function refreshToken() {
                 refresh: `${refreshToken}`,
             }),
             headers: {
-                // API требует обязательного указания заголовка content-type, так апи понимает что мы посылаем ему json строчку в теле запроса
                 "content-type": "application/json",
             },
         })
         const newToken = await response.json()
         localStorage.setItem('access', newToken.access)
         const newAccessToken = localStorage.getItem('access')
-        // console.log(newAccessToken)
         return newAccessToken
     } catch (error) {
         alert('требуется ввод логина и пароля')

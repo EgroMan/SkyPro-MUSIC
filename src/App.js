@@ -44,28 +44,32 @@ const GlobalStyle = createGlobalStyle`
   }
 
 `;
-
 export function App() {
+  const [status, setStatus] = useState(false);
   const [playerOn, setPlayerOn] = useState("hidden");
   const [user, setUser] = useState(false);
-  const [userName, setUserName] = useState(null)
-  const [userPass, setUserPass] = useState(null)
-  const [isLoginMode, setIsLoginMode] = useState(true)
-  const [listName, setListName] = useState('Tracks')
-  const [tracks, setTracks] = useState([{ id: "1" }])
-  let userLoginName = localStorage.getItem('userName')
-  let textName = 'Имя пользователя:'
-  let arrNameUser = [userLoginName, textName]
+  const [userName, setUserName]=useState(null)
+  const [userPass, setUserPass]=useState(null)
+  const [isLoginMode, setIsLoginMode]=useState(true)
+  const [listName, setListName]=useState('Tracks')
+  const [tracks, setTracks] =useState([{ id: "8" },
+  { id: "9" },{ id: "10" },{ id: "11" },{ id: "12" },{ id: "13" },{ id: "14" },{ id: "15" }])
+  
+  let userLoginName= localStorage.getItem('userName')
+  let textName= 'Имя пользователя:'
+  let arrNameUser=[userLoginName,textName]
 
   return (
     <div className="App">
-      <UserContext.Provider value={arrNameUser}>
-        <AppRoutes
-          tracks={tracks} setTracks={setTracks}
-          listName={listName} setListName={setListName} isLoginMode={isLoginMode} setIsLoginMode={setIsLoginMode} setUserPass={setUserPass} setUserName={setUserName} user={user} setUser={setUser} playerOn={playerOn} setPlayerOn={setPlayerOn} />
-        <Player playerVisibility={playerOn}
-        />
-      </UserContext.Provider>
+    <UserContext.Provider value={arrNameUser}>
+      <AppRoutes
+       tracks={tracks} setTracks={setTracks} 
+       status={status} setStatus={setStatus}
+       listName={listName} setListName={setListName} isLoginMode={isLoginMode}  setIsLoginMode={setIsLoginMode} setUserPass={setUserPass} setUserName={setUserName} user={user} setUser={setUser} playerOn={playerOn}setPlayerOn={setPlayerOn}/>
+      <Player playerVisibility = {playerOn} tracks={tracks} setTracks={setTracks}
+      status={status} setStatus={setStatus}
+      />
+    </UserContext.Provider> 
       <GlobalStyle />
     </div>
   );

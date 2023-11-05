@@ -295,7 +295,6 @@ export const Track__timeText = styled.div`
   text-align: right;
   color: #696969;
 `;
-//SkeletonStyle
 export const Skeleton_square = styled(Skeleton)`
   width: 50px;
   height: 50px;

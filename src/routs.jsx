@@ -11,8 +11,7 @@ import AuthPage from "./Pages/loginPage/AuthPage";
 import AuthPageReg from "./Pages/loginPage/registration";
 
 
-export function AppRoutes ({user, setUser,playerOn, setPlayerOn, setUserName, setUserPass, isLoginMode,setIsLoginMode, listName, setListName, tracks, setTracks}){
-    console.log(Boolean(user))
+export function AppRoutes ({status, setStatus, user, setUser,playerOn, setPlayerOn, setUserName, setUserPass, isLoginMode,setIsLoginMode, listName, setListName, tracks, setTracks}){
 return(
 <Routes>
 <Route  path="*" element ={<ErrPage/>}/>
@@ -21,10 +20,12 @@ return(
 <Route path="/account" element = {<Account/>}/>
 <Route  path="/:id" element ={<Favorites
 tracks={tracks} setTracks={setTracks} 
+status={status} setStatus={setStatus}
 listName={listName} setListName={setListName} user={user} setUser={setUser} playerOn={playerOn} setPlayerOn={setPlayerOn}/>}/>
-<Route  path="/category/:id" element ={<PlayListPage listName={listName} setListName={setListName} setPlayerOn={setPlayerOn}/>}/>
+<Route  path="/category/:id" element ={<PlayListPage status={status} setStatus={setStatus} listName={listName} setListName={setListName} setPlayerOn={setPlayerOn}/>}/>
 <Route  path="/" element ={<MainPage
 tracks={tracks} setTracks={setTracks}  
+status={status} setStatus={setStatus}
 listName={listName} setListName={setListName} user={user} setUser={setUser} playerOn={playerOn} setPlayerOn={setPlayerOn}/>}/>
 </Route>
 </Routes>
