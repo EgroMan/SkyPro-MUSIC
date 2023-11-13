@@ -2,11 +2,7 @@ import styled from "styled-components";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import {useSelector} from "react-redux";
 
-
-
-//main
-
-
+                                  //main
 export const Main=styled.div`
 -webkit-box-flex: 1;
 -ms-flex: 1 1 auto;
@@ -41,8 +37,7 @@ margin: 0 auto;
 position: relative;
 background-color: #181818;
 `
-//main ands
-
+                                                      //main ands
 
 export const FavoritesBlockContent = styled.div`
   display: -webkit-box;
@@ -195,10 +190,6 @@ export const Track__titleSvg = styled.svg`
   height: 17px;
   fill: transparent;
   stroke: #4e4e4e;
-
-   
-
-
 `;
 
 
@@ -219,11 +210,7 @@ animation: bubble_out 0.6s ease-in-out infinite both;
     transform: scale(1);
   }
 }
-
 `
-
-
-
 ;
 
 
@@ -244,11 +231,7 @@ display: block;
 //     transform: scale(1);
 //   }
 // }
-
 `
-
-
-
 ;
 export const Track__author = styled.div`
   width: 321px;
@@ -273,7 +256,7 @@ export const Track__albumLink = styled.div`
 export const Track_time = styled.div``;
 
 export const Track__timeSvg = styled.svg`
-  width: 18px;
+  width: 16px;
   height: 14px;
   margin-right: 17px;
   fill: transparent;
@@ -287,7 +270,7 @@ export const Track__timeText = styled.div`
   text-align: right;
   color: #696969;
 `;
-//SkeletonStyle
+                                                          //SkeletonStyle
 export const Skeleton_square = styled(Skeleton)`
   width: 50px;
   height: 50px;

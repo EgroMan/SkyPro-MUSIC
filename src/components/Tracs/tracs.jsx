@@ -2,7 +2,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 import React, { useState } from "react";
 
-import * as S from "./TrackStyle.js";
+import * as S from "./TrackStyle";
 
 
 export function Tracks({listName}) {

@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import logo from "./logo.png";
-import * as S from "./NavStyle.js";
-import { Link } from "react-router-dom";
+
+import * as S from "./NavStyle";
+
 
 export function Nav({setUser, setPlayerOn}) {
   const [menuVisible, setVisible] = useState(false);
   const menuClick = () => {
     setVisible(!menuVisible);
+    
   };
 
   return (
@@ -24,7 +26,9 @@ export function Nav({setUser, setPlayerOn}) {
         <S.NavMenu>
           <S.MenuList>
             <S.MenuItem>
+            
             <S.MenuLink to ="/">Главное</S.MenuLink>
+              
             </S.MenuItem>
             <S.MenuItem>
               <S.MenuLink to ="/favorites">Мой плейлист</S.MenuLink>

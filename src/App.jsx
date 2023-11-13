@@ -2,8 +2,12 @@ import { createGlobalStyle } from "styled-components";
 import { AppRoutes } from "./routs";
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Player } from "./components/Audioplayer/AudioPlayer";
-import { Nav } from "./components/Navmenu/NavMenu";
+
 export const UserContext = React.createContext(null);
+
+
+
+
 
 const GlobalStyle = createGlobalStyle`
 
@@ -44,7 +48,16 @@ const GlobalStyle = createGlobalStyle`
   }
 
 `;
+
+
+
+
+
+
 export function App() {
+  
+  
+  
   const [status, setStatus] = useState(false);
   const [playerOn, setPlayerOn] = useState("hidden");
   const [user, setUser] = useState(false);
@@ -52,8 +65,7 @@ export function App() {
   const [userPass, setUserPass]=useState(null)
   const [isLoginMode, setIsLoginMode]=useState(true)
   const [listName, setListName]=useState('Tracks')
-  const [tracks, setTracks] =useState([{ id: "8" },
-  { id: "9" },{ id: "10" },{ id: "11" },{ id: "12" },{ id: "13" },{ id: "14" },{ id: "15" }])
+  const [tracks, setTracks] =useState([])
   
   let userLoginName= localStorage.getItem('userName')
   let textName= 'Имя пользователя:'
@@ -62,14 +74,19 @@ export function App() {
   return (
     <div className="App">
     <UserContext.Provider value={arrNameUser}>
+    
       <AppRoutes
        tracks={tracks} setTracks={setTracks} 
+       
        status={status} setStatus={setStatus}
+       
        listName={listName} setListName={setListName} isLoginMode={isLoginMode}  setIsLoginMode={setIsLoginMode} setUserPass={setUserPass} setUserName={setUserName} user={user} setUser={setUser} playerOn={playerOn}setPlayerOn={setPlayerOn}/>
       <Player playerVisibility = {playerOn} tracks={tracks} setTracks={setTracks}
+      
       status={status} setStatus={setStatus}
       />
     </UserContext.Provider> 
+      
       <GlobalStyle />
     </div>
   );

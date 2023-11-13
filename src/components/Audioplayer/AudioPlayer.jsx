@@ -1,13 +1,15 @@
 import sprite from "./sprite.svg";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "react-loading-skeleton/dist/skeleton.css";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "../../img/icon/play.svg";
 import * as S from "./PlayerStyles";
-import { getMyTracks, getTracks } from "../../api";
-import { UserContext } from "../../App"
-import { useNavigate, useParams } from "react-router-dom";
+import { getMyTracks, getTracks, refreshToken } from "../../api";
+
+import { useNavigate } from "react-router-dom";
 import { addMyTracks, delMyTracks } from "../../api";
+import { PlayerVolume } from "./Volume";
+//redux
 
 import { useSelector } from "react-redux";
 import {
@@ -20,69 +22,65 @@ import {
   setOnDotRedux,
   setOffDotRedux,
   setCycleRedux,
-  setTrackRedux,
   setTracksRedux,
   setMyTracksRedux
 } from "../../store/reducers/playerSlice";
 import { useDispatch } from "react-redux";
 
+
+
 export function Player({ playerVisibility, tracks, setTracks, status, setStatus }) {
 
   const [liked, setLiked] = useState()
-  const param = useParams()
+
   const realPlayer = useRef(null);
   const [playerOn, setPlayerOn] = useState(false);
   const [loopOn, setLoopOn] = useState(false);
-  const [volumeOn, setVolumeOn] = useState(0.2);
+
   const [progressOn, setProgressOn] = useState(0);
   const [trackTime, setTrackTime] = useState(0);
   const [mix, setMixOn] = useState(false);
-  const userName = useContext(UserContext)
 
-  const tracksRedux = useSelector(state => state.track.tracks)
-
+  const [allTracks, setAllTracks] = useState([])
+  //redux
   const activeTrackRedux = useSelector(state => state.track.activeTrack)
-  const isLikedRedux = useSelector(state => state.track.isLiked)
   const myTracks = useSelector(state => state.track.myTracks)
-  console.log(myTracks)
+  const filterState = useSelector(state => state.track.filterState)
   const dispatch = useDispatch()
   let activeTrack = activeTrackRedux
   const navigate = useNavigate()
-
+  const filterTracks = useSelector(state => state.track.tracks)
   useEffect(() => {
     renderTracks()
     likes()
-    console.log('i work');
+
 
 
     if (!playerOn) {
       setTimeout(() => {
         realPlayer?.current.addEventListener("timeupdate", () => {
-          setProgressOn(realPlayer.current.currentTime);
-          dispatch(setProgressRedux(realPlayer.current.currentTime))
-
+          setProgressOn(realPlayer?.current.currentTime);
+          dispatch(setProgressRedux(realPlayer?.current.currentTime))
         });
       }, 1);
       setTimeout(() => {
         realPlayer?.current.addEventListener("loadedmetadata", () => {
-          setTrackTime(realPlayer.current.duration);
-
-          dispatch(setTimeRedux(realPlayer.current.duration))
+          setTrackTime(realPlayer?.current.duration);
+          dispatch(setTimeRedux(realPlayer?.current.duration))
         });
       }, 1);
 
       return () => {
-        realPlayer.current.removeEventListener("timeupdate", () => {
-          setProgressOn(realPlayer.current.currentTime);
+        realPlayer?.current.removeEventListener("timeupdate", () => {
+          setProgressOn(realPlayer?.current.currentTime);
         });
-        realPlayer?.current.removeEventListener("loadedmetadata", () => {
-          setTrackTime(realPlayer.current.duration);
+        realPlayer.current.removeEventListener("loadedmetadata", () => {
+          setTrackTime(realPlayer?.current.duration);
         });
       };
     }
 
-  }, [activeTrack, status
-  ]);
+  }, [activeTrack, status]);
 
   function triggerLikes() {
     if (liked === true) { }
@@ -96,6 +94,7 @@ export function Player({ playerVisibility, tracks, setTracks, status, setStatus 
     realPlayer?.current.play();
     setPlayerOn(true);
     dispatch(setOnDotRedux())
+
   };
   const clickPlayerStop = () => {
     realPlayer?.current.pause();
@@ -106,13 +105,13 @@ export function Player({ playerVisibility, tracks, setTracks, status, setStatus 
     realPlayer.current.loop = true;
     setLoopOn(true);
     dispatch(setCycleRedux())
+
   };
   const clickPlayerLoopOff = () => {
     realPlayer.current.loop = false;
     setLoopOn(false);
     dispatch(setCycleRedux())
   };
-
   const clickPlayerShuffleOn = () => {
     dispatch(setShuffleRedux())
     setMixOn(true);
@@ -125,55 +124,62 @@ export function Player({ playerVisibility, tracks, setTracks, status, setStatus 
   setTimeout(() => {
     setContentVisible(true);
   }, 500);
-
   if (playerOn) {
-    realPlayer.current.play();
+    realPlayer?.current.play();
   }
-  console.log(activeTrackRedux)
 
-  function renderLikes(id) {
+  //LIKES-START
+
+  function renderLikes(activeTrack) {
+    let item = allTracks.find((item) => item.name === activeTrack.name)
+    let id = item.id
     addMyTracks(id).then(() => { renderTracks() }
     ).catch((err) => {
-      console.log(err.message)
+
     })
   }
-  function renderDisLikes(id) {
+  function renderDisLikes(activeTrack) {
+
+    let item = allTracks.find((item) => item.name === activeTrack.name)
+    let id = item.id
     delMyTracks(id).then(() => renderTracks()
     ).catch((err) => {
-      console.log(err.message)
     })
   }
   function renderTracks() {
-
     getTracks()
       .then((data) => {
-        setTracks(data);
-        dispatch(setTracksRedux(data));
+        setAllTracks(data);
+        if (!filterState) { setTracks(data); }
+        if (!filterState) {
+          dispatch(setTracksRedux(data))
+        } else {
+          dispatch(setTracksRedux(filterTracks))
+        }
         setContentVisible(true);
       }).then(() => {
         getMyTracks().then((data) => { dispatch(setMyTracksRedux(data)) })
-
         .catch((error) => {
+          refreshToken().then(() => { getMyTracks().then((data) => { dispatch(setMyTracksRedux(data)) }) })
           setContentVisible(true);
-          localStorage.removeItem('userName')
-          navigate("/login", { replace: true })
-        })
 
+        })
       })
       .catch((error) => {
+        alert(error.message)
         setContentVisible(true);
         localStorage.removeItem('userName')
         navigate("/login", { replace: true })
+
       })
   }
+
   function likes() {
-    console.log(activeTrack)
-    console.log(myTracks)
+
     let likedTrack = myTracks.find(item => item.name === activeTrack.name)
     setLiked(Boolean(likedTrack))
-    console.log(Boolean(likedTrack))
   }
-
+  //LIKES-END
   return (
     <S.bar style={{ visibility: `${playerVisibility}` }}>
       <S.barContent>
@@ -194,10 +200,12 @@ export function Player({ playerVisibility, tracks, setTracks, status, setStatus 
           onChange={(e) => {
             realPlayer.current.currentTime = e.target.value;
             setProgressOn(e.target.value);
+
           }}
           value={progressOn}
           max={trackTime}
         ></S.progress>
+
         <S.playerBlock>
           <S.barPlayer_player>
             <div>
@@ -209,29 +217,34 @@ export function Player({ playerVisibility, tracks, setTracks, status, setStatus 
               <S.playerBtnPrev>
                 <S.playerBtnPrevSvg
                   onClick={() => { dispatch(setPrevRedux()) }}
+                  //PREV
                   alt="prev"
                 >
                   <use xlinkHref="img/icon/sprite.svg#icon-prev"></use>
                   <use href={`${sprite}#icon-prev`} />
                 </S.playerBtnPrevSvg>
               </S.playerBtnPrev>
+
               <S.playerBtnPlay className="_btn">
                 <S.playerBtnPlaySvg
                   onClick={
-                    playerOn ? clickPlayerStop : clickPlayerStart
+                    playerOn ? clickPlayerStop : clickPlayerStart                  //START-STOP
                   }
                   alt="play"
                 >
+
                   <use
                     href={
                       playerOn ? `${sprite}#icon-pause` : `${sprite}#icon-play`
                     }
                   />
+
                 </S.playerBtnPlaySvg>
               </S.playerBtnPlay>
               <S.playerBtnNext>
                 <S.playerBtnNextSvg
-                  onClick={() => { dispatch(setNextRedux()) }}
+                  onClick={() => { dispatch(setNextRedux()) }}                            //NEXT
+
                   alt="next">
                   <use xlinkHref="img/icon/sprite.svg#icon-next"></use>
                   <use href={`${sprite}#icon-next`} />
@@ -242,19 +255,22 @@ export function Player({ playerVisibility, tracks, setTracks, status, setStatus 
                   onClick={loopOn ? clickPlayerLoopOff : clickPlayerLoopOn}
                   alt="repeat"
                 >
+
                   <use
                     href={loopOn ? `${sprite}#loopOn` : `${sprite}#icon-repeat`}
-
-
-
+                  // REPEAT
                   />
                 </S.playerBtnRepeatSvg>
               </S.playerBtnRepeat>
               <S.playerBtnShuffle className=" _btn-icon">
+
                 <S.playerBtnShuffleSvg
                   onClick={mix ? clickPlayerShuffleOff : clickPlayerShuffleOn}
+
+                  //SHUFFLE
                   alt="shuffle"
                 >
+
                   <use href={mix ? `${sprite}#icon-shuffle-off` : `${sprite}#icon-shuffle`} />
                 </S.playerBtnShuffleSvg>
               </S.playerBtnShuffle>
@@ -301,17 +317,27 @@ export function Player({ playerVisibility, tracks, setTracks, status, setStatus 
               </S.playerTrackPlayContain>
               <S.playerTrackPlayLkeDislike>
                 <S.playerTrackPlayLke onClick={() => {
-                  console.log('like'); renderLikes(activeTrack.id); triggerLikes()
+                  renderLikes(activeTrack)
+
+
+                  triggerLikes()
+
+
 
                 }} className=" _btn-icon">
                   <S.playerTrackPlayLikeSvg alt="like">
+                    {/* //LIKES */}
+
                     <use href={
+
                       liked ? `${sprite}#icon-like-liked` : `${sprite}#icon-like`
+
                     } />
-                    {console.log(activeTrackRedux.stared_user)}
+
+
                   </S.playerTrackPlayLikeSvg>
                 </S.playerTrackPlayLke>
-                <S.playerTrackPlayDisLke onClick={() => { console.log('disLike'); renderDisLikes(activeTrack.id); triggerDisLikes() }} className="_btn-icon">
+                <S.playerTrackPlayDisLke onClick={() => { renderDisLikes(activeTrack); triggerDisLikes() }} className="_btn-icon">
                   <S.playerTrackPlayDisLikeSvg alt="dislike">
                     <use xlinkHref="img/icon/sprite.svg#icon-dislike"></use>
                     <use href={`${sprite}#icon-dislike`} />
@@ -320,33 +346,13 @@ export function Player({ playerVisibility, tracks, setTracks, status, setStatus 
               </S.playerTrackPlayLkeDislike>
             </S.playerTrackPlay>
           </S.barPlayer_player>
-          <S.playerBarVolBlock className="volume">
-            <S.playerBarVolContent>
-              <S.playerBarVolImg>
-                <S.playerBarVolSvg alt="volume">
-                  <use xlinkHref="img/icon/sprite.svg#icon-volume"></use>
-                  <use href={`${sprite}#icon-volume`} />
-                </S.playerBarVolSvg>
-              </S.playerBarVolImg>
-              <S.playerBarVolProgress className="_btn">
-                <S.playerBarVolProgressLine
-                  onChange={(e) => {
-                    let volumeRange = e.target.value / 100;
-                    realPlayer.current.volume = volumeRange;
-                    setVolumeOn(volumeRange);
 
-                  }}
-                  className="_btn"
-                  type="range"
-                  name="range"
-                />
-              </S.playerBarVolProgress>
-            </S.playerBarVolContent>
-          </S.playerBarVolBlock>
+          <PlayerVolume playerOn={playerOn} realPlayer={realPlayer} playerVisibility={playerVisibility} tracks={tracks} setTracks={setTracks} status={status} setStatus={setStatus} />
+
         </S.playerBlock>
       </S.barContent>
     </S.bar>
 
   );
 
-} 
+}

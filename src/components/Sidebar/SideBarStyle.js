@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import Skeleton from "react-loading-skeleton";
 import { Link } from "react-router-dom";
 
 export const sidebarMain = styled.div`

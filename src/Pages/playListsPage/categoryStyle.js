@@ -281,8 +281,8 @@ export const Track__albumLink = styled.div`
 export const Track_time = styled.div``;
 
 export const Track__timeSvg = styled.svg`
-  width: 14px;
-  height: 12px;
+  width: 16px;
+  height: 14px;
   margin-right: 17px;
   fill: transparent;
   stroke: #696969;
@@ -295,6 +295,7 @@ export const Track__timeText = styled.div`
   text-align: right;
   color: #696969;
 `;
+//SkeletonStyle
 export const Skeleton_square = styled(Skeleton)`
   width: 50px;
   height: 50px;

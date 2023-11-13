@@ -20,11 +20,9 @@ export default function AuthPageReg({ isLoginMode, setUserName, setUserPass,setU
       setPlaceholderPass('заполните поле ввода')
       setPlaceholderUser('заполните поле ввода')}
     else{
-    login(email,password).then((data)=>{console.log(data);
+    login(email,password).then((data)=>{c
       setError(data.detail)
       ;})
-    // alert(`Выполняется вход: ${email} ${password}`);
-    //setError("Неизвестная ошибка входа");
   }
   };
 
@@ -36,47 +34,34 @@ export default function AuthPageReg({ isLoginMode, setUserName, setUserPass,setU
       }
     else{
     registration(email,password,email)
-    .then((response)=>{console.log(response)
+    .then((response)=>{
 
     if (response.status!==201){
     responseStatus=false
     let data = response.json()
-    
     return data}
     else{ 
     responseStatus=true
     let data = response.json()
     
     return data}})
-    
     .then((data)=>{
       if(responseStatus===false){
       let errArr=[]
       errArr.push(data.username,data.email,data.password)
       let index = errArr.indexOf(undefined)
       errArr.splice(index,1)
-      console.log(errArr)
       let errString = errArr.join(' / ')
-      console.log(errString);setError(errString);}
-
+      ;setError(errString);}
       else{
         localStorage.setItem('user', data.username)
         setIsLoginMode(true)
-        console.log(localStorage.getItem('user'))
       }
-
     })
-    
     }
-
-    
-    // alert(`Выполняется регистрация: ${email} ${password}`);
-    // setError("Неизвестная ошибка входа");
-    //}
-
   };
 
-  // Сбрасываем ошибку если пользователь меняет данные на форме или меняется режим формы
+  // Сбрасываем ошибку
   useEffect(() => {
     setError(null);
   }, [isLoginMode, email, password, repeatPassword]);

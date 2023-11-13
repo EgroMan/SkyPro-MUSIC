@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
-import {useSelector} from "react-redux";
+import Skeleton from "react-loading-skeleton";
+
 
 
 export const CentralBlockContent = styled.div`
@@ -11,6 +11,7 @@ export const CentralBlockContent = styled.div`
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
+  margin: auto;
 `;
 export const CentralBlockContentTitle = styled.div`
   display: -webkit-box;
@@ -33,6 +34,7 @@ export const CentralBlock_playlistTitle = styled(
 )``;
 
 export const CentralBlockContentPlaylist = styled.div`
+
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -168,7 +170,6 @@ animation: bubble_out 0.6s ease-in-out infinite both;
     transform: scale(1);
   }
 }
-
 `
 ;
 
@@ -215,8 +216,8 @@ export const Track__albumLink = styled.div`
 export const Track_time = styled.div``;
 
 export const Track__timeSvg = styled.svg`
-  width: 18px;
-  height: 13px;
+  width: 16px;
+  height: 14px;
   margin-right: 17px;
   fill: transparent;
   stroke: #696969;

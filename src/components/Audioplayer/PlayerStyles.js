@@ -287,7 +287,7 @@ export const playerTrackPlayLke = styled.div`
   padding: 5px;
 `;
 export const playerTrackPlayLikeSvg = styled.svg`
-  width: 20px;
+  width: 16px;
   height: 14px;
   fill: transparent;
   stroke: #696969;

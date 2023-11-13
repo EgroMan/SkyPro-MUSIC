@@ -2,30 +2,33 @@ import sprite from "./sprite.svg";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import React, { useContext, useEffect, useState } from "react";
-import * as S from "./ContentStyle.js";
+import * as S from "./ContentStyle";
 import { addMyTracks, delMyTracks, getTracks } from "../../api";
 import { UserContext } from "../../App"
 //redux
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { setTrackRedux, setTracksRedux, setIsLiked } from "../../store/reducers/playerSlice";
+import { setTrackRedux, setTracksRedux } from "../../store/reducers/playerSlice";
 import { useNavigate } from "react-router-dom";
 
 
 let errorText = null;
-let liked = false;
 
-export function Content({ status, setStatus, playerOn, setPlayerOn, user, setUser, tracks, setTracks }) {
+
+export function Content({ status, setStatus, setPlayerOn, tracks, setTracks }) {
   const [contentVisible, setContentVisible] = useState(false);
   const [error, setError] = useState(null)
   const userName = useContext(UserContext)
   const navigate = useNavigate()
 
 
+
   //redux
   const activeTrackRedux = useSelector(state => state.track.activeTrack)
   const playerOnDot = useSelector(state => state.track.playerOn)
   const dispatch = useDispatch();
+  const filterState = useSelector(state => state.track.filterState)
+  const filterTracks = useSelector(state => state.track.tracks)
 
   function likes(track) {
     for (let index_user = 0; index_user < track.stared_user.length; index_user++) {
@@ -49,17 +52,14 @@ export function Content({ status, setStatus, playerOn, setPlayerOn, user, setUse
       setError(err.message);
     })
   }
-
   function renderTracks() {
     getTracks()
       .then((data) => {
         errorText = null;
         setTracks(data);
-        dispatch(setTracksRedux(data));
-        setContentVisible(true);
+        if (!filterState) { dispatch(setTracksRedux(data)); };
         status ? setStatus(false) : setStatus(true);
         return tracks;
-
       })
       .catch((error) => {
         errorText = error.message;
@@ -67,24 +67,38 @@ export function Content({ status, setStatus, playerOn, setPlayerOn, user, setUse
         setTracks([]);
         localStorage.removeItem('userName')
         return errorText;
-      })
+      }).then(() => { setTimeout(() => setContentVisible(true), 5000) })
   }
-
   useEffect(() => {
     renderTracks()
-  }, [dispatch]);
+  }, [
+    dispatch, setTracks
+  ]);
+  let newTracks;
+  let skeletonTracks = [
+    { id: "8" },
+    { id: "9" }, 
+    { id: "10" }, 
+    { id: "11" }, 
+    { id: "12" }, 
+    { id: "13" }, 
+    { id: "14" }, 
+    { id: "15" }
+  ]
+  { contentVisible ? newTracks = tracks : newTracks = skeletonTracks }
   return (
-    <S.CentralBlockContent>
-
+    <S.CentralBlockContent style={{ overflowY: "auto", maxHeight: "850px", maxMargin: "auto" }}>
       {error && <h2 style={{
         color: 'red',
         alignSelf: 'center'
       }}>{error} для простановки лайков</h2>}
       <S.CentralBlock_playlistTitle>
+
         <S.PlaylistTitleCol01>Трек</S.PlaylistTitleCol01>
         <S.PlaylistTitleCol02>ИСПОЛНИТЕЛЬ</S.PlaylistTitleCol02>
         <S.PlaylistTitleCol03>АЛЬБОМ</S.PlaylistTitleCol03>
         <S.PlaylistTitleCol04>
+
           <S.Playlist__titleSvg alt="time">
             <use xlinkHref="img/icon/sprite.svg#icon-watch"></use>
           </S.Playlist__titleSvg>
@@ -98,23 +112,30 @@ export function Content({ status, setStatus, playerOn, setPlayerOn, user, setUse
               : null}
           </h1>
         </div>
-        {tracks.map((track) => {
+
+        {newTracks.map((track) => {
+
           return (
             <S.Playlist__item key={track.id} >
               <S.Playlist__track
                 onClick={(e) => {
+
                   e.preventDefault();
                   setPlayerOn('');
+                  e.stopPropagation()
                   dispatch(setTrackRedux({ track, tracks }))
+
                 }}
               >
                 <S.Track__title>
                   <S.Track__titleImage >
                     {contentVisible ? (<>
+
                       <S.Playlist__titleSvg_dot_Pause style={track.id === activeTrackRedux.id & playerOnDot === false ? {
                         display: 'block'
                       } : { display: 'none' }}></S.Playlist__titleSvg_dot_Pause>
                       <S.Playlist__titleSvg_dot style={track.id === activeTrackRedux.id & playerOnDot === true ? { display: 'block' } : { display: 'none' }}></S.Playlist__titleSvg_dot>
+
                       <S.Track__titleSvg style={track.id === activeTrackRedux.id ? {
                         display: 'none'
                       } : {}} alt="music">
@@ -131,8 +152,7 @@ export function Content({ status, setStatus, playerOn, setPlayerOn, user, setUse
                   </S.Track__titleImage>
                   <S.Track_titleText>
                     <S.Track__titleLink
-                      onClick={() => {
-                      }}
+
                       className="trackNameLink"
                       href="http://"
                     >
@@ -174,15 +194,14 @@ export function Content({ status, setStatus, playerOn, setPlayerOn, user, setUse
                 </S.Track__album>
                 <S.Track_time>
                   {contentVisible ? (
-                    <S.Track__timeSvg onClick={() => {
+                    <S.Track__timeSvg onClick={(e) => {
+                      e.stopPropagation();
                       likes(track) !== track.id ? renderLikes(track.id) : renderDisLikes(track.id);
-                      console.log('wor11111');
-                      dispatch(setTrackRedux({ track, tracks }))
                     }
-
                     } alt="time">
+                      {/* LIKES */}
                       <use xlinkHref="img/icon/sprite.svg#icon-like"></use>
-                      <use href={
+                      <use style={{ zIndex: '1000' }} href={
                         likes(track) === track.id ? `${sprite}#icon-like-liked` : `${sprite}#icon-like`
                       } />
                     </S.Track__timeSvg>
@@ -191,7 +210,6 @@ export function Content({ status, setStatus, playerOn, setPlayerOn, user, setUse
                       <S.Skeleton_lineMini />
                     </SkeletonTheme>
                   )}
-
                   {contentVisible ? (
                     <S.Track__timeText>
                       {track.duration_in_seconds}
