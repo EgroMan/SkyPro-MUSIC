@@ -122,9 +122,6 @@ background:${(props) =>(props.stylepropsyear==='year'? "rgb(58, 17, 58)" : "blac
 `;
 
 export const centralBlockFilterButtonGenre = styled.button`
-
-
-
 background:${(props) =>(props.stylepropsgenre==='genre'? "rgb(58, 17, 58)" : "black") } ;
   color: white;
   font-style: normal;
@@ -137,7 +134,6 @@ background:${(props) =>(props.stylepropsgenre==='genre'? "rgb(58, 17, 58)" : "bl
   &:focus {
     background-color: rgb(58, 17, 58);
   }
- 
   &:not(:last-child) {
     margin-right: 10px;
   }
@@ -184,9 +180,10 @@ display:${(props) =>(props.isactive === "style" ? "block" : "none") };
 overflow-y:scroll;
 top: 50px;
 border-radius: 10px;
+padding-top: 10px;
 padding-left: 20px;
 min-width: 248px;
-min-height:200px;
+min-height: 180px;
 max-height: 305px;
 background: #313131;
 position: absolute;

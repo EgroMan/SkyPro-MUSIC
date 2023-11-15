@@ -327,15 +327,10 @@ export function Filter({ setTracks }) {
             <li style={{ marginBottom: '25px' }} key={'rk'}>
               <S.filterBlockLink onClick={() => { setGenre(2); genreChoose() }} href="#">Рок</S.filterBlockLink>
             </li>
-            <li style={{ marginBottom: '25px' }} key={'{hp}'}>
-              <S.filterBlockLink onClick={() => { setGenre(0); genreChoose() }} href="#">Хипхоп</S.filterBlockLink>
-            </li>
             <li style={{ marginBottom: '25px' }} key={'{hp2}'}>
               <S.filterBlockLink onClick={() => { setGenre(1); genreChoose() }} href="#">Хипхоп</S.filterBlockLink>
             </li>
           </S.styleFilterUl>
-
-
         </div>
       </S.filterBlockStyle>
     </S.centralBlockFilter>

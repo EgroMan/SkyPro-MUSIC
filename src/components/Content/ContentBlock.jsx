@@ -23,6 +23,7 @@ export function Content({ status, setStatus, setPlayerOn, tracks, setTracks }) {
 
 
 
+
   //redux
   const activeTrackRedux = useSelector(state => state.track.activeTrack)
   const playerOnDot = useSelector(state => state.track.playerOn)
@@ -87,7 +88,7 @@ export function Content({ status, setStatus, setPlayerOn, tracks, setTracks }) {
   ]
   { contentVisible ? newTracks = tracks : newTracks = skeletonTracks }
   return (
-    <S.CentralBlockContent style={{ overflowY: "auto", maxHeight: "850px", maxMargin: "auto" }}>
+    <S.CentralBlockContent>
       {error && <h2 style={{
         color: 'red',
         alignSelf: 'center'
@@ -104,7 +105,7 @@ export function Content({ status, setStatus, setPlayerOn, tracks, setTracks }) {
           </S.Playlist__titleSvg>
         </S.PlaylistTitleCol04>
       </S.CentralBlock_playlistTitle>
-      <S.CentralBlockContentPlaylist>
+      <S.CentralBlockContentPlaylist style={{ maxHeight: "800px", overflowY: "auto" }}>
         <div style={{ color: "red" }}>
           <h1>
             {errorText !== null

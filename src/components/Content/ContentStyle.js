@@ -34,7 +34,6 @@ export const CentralBlock_playlistTitle = styled(
 )``;
 
 export const CentralBlockContentPlaylist = styled.div`
-
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -43,6 +42,9 @@ export const CentralBlockContentPlaylist = styled.div`
   -ms-flex-direction: column;
   flex-direction: column;
   overflow-y: auto;
+  &::-webkit-scrollbar {
+  display: none;
+  }
 `;
 export const PlaylistTitleCol = styled.div`
   font-style: normal;
