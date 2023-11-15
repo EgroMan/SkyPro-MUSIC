@@ -42,7 +42,7 @@ gap: 10px;
   top: 50px;
   border-radius: 10px;
   padding-left: 20px;
-  min-width: 220px;
+  min-width: 200px;
   height:fit-content;
   background: #313131;
   position: absolute;
@@ -162,6 +162,7 @@ export const filterBlockStyle = styled.div`
   flex-direction: column;
 `;
 export const filterBlockLink = styled.a`
+padding-top: 5px;
 color: aliceblue;
 &:hover{
   text-decoration: underline;
